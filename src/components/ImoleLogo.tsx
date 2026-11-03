@@ -53,3 +53,4 @@ export default function ImoleLogo({ size = 'md', light = false }: ImoleLogoProps
     </div>
   );
 }
+

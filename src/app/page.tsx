@@ -6,12 +6,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import ImoleLogo from '@/components/ImoleLogo';
 import TrustBadges from '@/components/TrustBadges';
 import BottomNav from '@/components/BottomNav';
+import LanguageToggle from '@/components/LanguageToggle';
 
 function LandingPageContent() {
   const { t } = useI18n();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const kioskId = searchParams.get('kiosk') || 'H00000147A';
+  const kioskId = searchParams.get('kiosk');
   
   const [acceptedTerms, setAcceptedTerms] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,20 +28,19 @@ function LandingPageContent() {
       const res = await fetch('/api/checkout_sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kiosk_id: kioskId }),
+        body: JSON.stringify({ kiosk_id: kioskId || 'H00000147A' }),
       });
       const data = await res.json();
       
       if (res.ok && data.url) {
         window.location.href = data.url;
       } else {
-        // Smooth demo fallback when test Stripe keys are pending
         setTimeout(() => {
-          router.push(`/active?kiosk=${kioskId}`);
+          router.push(`/active${kioskId ? `?kiosk=${kioskId}` : ''}`);
         }, 600);
       }
     } catch {
-      router.push(`/active?kiosk=${kioskId}`);
+      router.push(`/active${kioskId ? `?kiosk=${kioskId}` : ''}`);
     }
   };
 
@@ -49,19 +49,19 @@ function LandingPageContent() {
       {/* Brand Header */}
       <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
         <ImoleLogo size="md" />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#FFFFFF', padding: '0.4rem 0.75rem', borderRadius: '9999px', border: '1px solid #ECEAF5', boxShadow: 'var(--shadow-sm)' }}>
-          <span className="live-dot" />
-          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#059669' }}>Borne Active</span>
-        </div>
+        <LanguageToggle variant="light" />
       </header>
 
       {/* Hero Greeting */}
       <section style={{ marginBottom: '1.25rem' }}>
-        <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-          {t('welcome')}
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.25rem' }}>
+          <span className="live-dot" />
+          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#059669', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            {t('stationOnline')}
+          </span>
+        </div>
         <h1 style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--primary-brand)', lineHeight: 1.2 }}>
-          Rechargez en toute liberté
+          {t('heroTitle')}
         </h1>
       </section>
 
@@ -69,14 +69,11 @@ function LandingPageContent() {
       <section className="fintech-card" style={{ marginBottom: '1.25rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
           <div>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-              Borne sélectionnée
-            </span>
-            <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#111827', margin: '0.15rem 0' }}>
-              Station #{kioskId}
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#111827', margin: '0 0 0.2rem 0' }}>
+              {t('kioskCardTitle')}
             </h2>
             <p style={{ fontSize: '0.8rem', color: '#059669', display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 600 }}>
-              <span>✓</span> Batteries disponibles • 100% chargées
+              <span>✓</span> {t('kioskCardSubtitle')}
             </p>
           </div>
           <div style={{
@@ -90,7 +87,7 @@ function LandingPageContent() {
             boxShadow: '0 4px 12px rgba(48, 14, 88, 0.25)'
           }}>
             5000 mAh
-            <div style={{ fontSize: '0.65rem', opacity: 0.85, fontWeight: 500 }}>Charge Rapide</div>
+            <div style={{ fontSize: '0.65rem', opacity: 0.85, fontWeight: 500 }}>Fast Charge</div>
           </div>
         </div>
 
@@ -108,16 +105,16 @@ function LandingPageContent() {
           </span>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', marginTop: '0.5rem' }}>
             <div className="pill-tier" style={{ borderColor: 'rgba(48, 14, 88, 0.25)', background: '#FAF7FD' }}>
-              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary-brand)' }}>2,49 €</span>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1.2 }}>Déverrouillage + 1h</span>
+              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary-brand)' }}>{t('pricing1stHour')}</span>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1.2 }}>{t('pricing1stHourLabel')}</span>
             </div>
             <div className="pill-tier">
-              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#111827' }}>1,99 €</span>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1.2 }}>Par heure suppl.</span>
+              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#111827' }}>{t('pricingSubsequent')}</span>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1.2 }}>{t('pricingSubsequentLabel')}</span>
             </div>
             <div className="pill-tier">
-              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#111827' }}>12,99 €</span>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1.2 }}>Plafond 24h</span>
+              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#111827' }}>{t('pricingDayCap')}</span>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1.2 }}>{t('pricingDayCapLabel')}</span>
             </div>
           </div>
         </div>
@@ -137,7 +134,7 @@ function LandingPageContent() {
         }}>
           <span style={{ fontSize: '1.1rem' }}>🛡️</span>
           <span>
-            <strong>Empreinte temporaire de 24,99 €</strong> : vous n&apos;êtes facturé(e) que pour la durée réelle utilisée lors du retour.
+            <strong>{t('depositNoticeTitle')}</strong> : {t('depositNoticeText')}
           </span>
         </div>
       </section>
@@ -150,11 +147,11 @@ function LandingPageContent() {
           disabled={isLoading}
         >
           {isLoading ? (
-            <span>Connexion à la borne...</span>
+            <span>{t('unlocking')}</span>
           ) : (
             <>
               <span>⚡</span>
-              <span>Déverrouiller avec Apple Pay / CB</span>
+              <span>{t('unlockBtn')}</span>
             </>
           )}
         </button>
@@ -180,9 +177,9 @@ function LandingPageContent() {
         </div>
       </section>
 
-      {/* French & European Institutional Trust Badges */}
+      {/* Trust Badges */}
       <section style={{ marginBottom: '1.5rem' }}>
-        <TrustBadges />
+        <TrustBadges variant="light" />
       </section>
 
       {/* Bottom Navigation */}
@@ -193,7 +190,7 @@ function LandingPageContent() {
 
 export default function LandingPage() {
   return (
-    <Suspense fallback={<div className="page-container" style={{ justifyContent: 'center', textAlign: 'center' }}>Chargement d&apos;IMỌLẸ...</div>}>
+    <Suspense fallback={<div className="page-container" style={{ justifyContent: 'center', textAlign: 'center' }}>Chargement...</div>}>
       <LandingPageContent />
     </Suspense>
   );

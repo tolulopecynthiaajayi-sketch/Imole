@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import ImoleLogo from '@/components/ImoleLogo';
 import BottomNav from '@/components/BottomNav';
+import LanguageToggle from '@/components/LanguageToggle';
 
 function ReceiptContent() {
   const { t } = useI18n();
@@ -13,7 +14,6 @@ function ReceiptContent() {
   
   const durationMinutes = searchParams.get('duration') || '42';
   const finalCost = searchParams.get('cost') || '2,49';
-  const kioskId = searchParams.get('kiosk') || 'H00000147A';
 
   // Calculate hold released
   const costFloat = parseFloat(finalCost.replace(',', '.')) || 2.49;
@@ -22,8 +22,9 @@ function ReceiptContent() {
   return (
     <div className="page-container animate-slide-up">
       {/* Brand Header */}
-      <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+      <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
         <ImoleLogo size="md" />
+        <LanguageToggle variant="light" />
       </header>
 
       {/* Success Badge */}
@@ -44,10 +45,10 @@ function ReceiptContent() {
           ✓
         </div>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#111827' }}>
-          Batterie restituée !
+          {t('receiptSuccess')}
         </h1>
         <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-          Merci d&apos;avoir utilisé le réseau IMỌLẸ.
+          {t('receiptThanks')}
         </p>
       </div>
 
@@ -55,7 +56,7 @@ function ReceiptContent() {
       <section className="fintech-card" style={{ marginBottom: '1.5rem' }}>
         <div style={{ textAlign: 'center', paddingBottom: '1.25rem', borderBottom: '1px dashed #E5E7EB', marginBottom: '1.25rem' }}>
           <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-            Montant final débité
+            {t('finalChargedLabel')}
           </span>
           <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--primary-brand)', margin: '0.25rem 0' }}>
             {finalCost} €
@@ -71,30 +72,26 @@ function ReceiptContent() {
             fontSize: '0.75rem',
             fontWeight: 700,
           }}>
-            <span>✓</span> Caution restante libérée : {holdReleased} €
+            <span>✓</span> {t('holdReleasedBadge')} : {holdReleased} €
           </span>
         </div>
 
         {/* Detailed Breakdown */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', fontSize: '0.82rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ color: 'var(--text-muted)' }}>Durée de location :</span>
+            <span style={{ color: 'var(--text-muted)' }}>{t('durationLabel')}</span>
             <strong>{durationMinutes} minutes</strong>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ color: 'var(--text-muted)' }}>Borne de restitution :</span>
-            <strong>Station #{kioskId}</strong>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ color: 'var(--text-muted)' }}>Moyen de paiement :</span>
+            <span style={{ color: 'var(--text-muted)' }}>{t('paymentMethodLabel')}</span>
             <strong>Apple Pay / Carte</strong>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ color: 'var(--text-muted)' }}>Empreinte initiale :</span>
+            <span style={{ color: 'var(--text-muted)' }}>{t('initialHoldLabel')}</span>
             <span>24,99 €</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', color: '#059669', fontWeight: 700 }}>
-            <span>Reste débloqué sur votre compte :</span>
+            <span>{t('amountReleasedLabel')}</span>
             <span>+ {holdReleased} €</span>
           </div>
         </div>
@@ -106,7 +103,7 @@ function ReceiptContent() {
           className="btn-primary-action"
           onClick={() => router.push('/')}
         >
-          Retour à l&apos;accueil
+          {t('backHomeBtn')}
         </button>
       </section>
 

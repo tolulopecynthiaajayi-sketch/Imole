@@ -6,12 +6,16 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Suspense } from 'react';
 import ImoleLogo from '@/components/ImoleLogo';
 import TrustBadges from '@/components/TrustBadges';
+import LanguageToggle from '@/components/LanguageToggle';
 
 function KioskContent() {
   const { t } = useI18n();
   const searchParams = useSearchParams();
-  const kioskId = searchParams.get('kiosk') || 'H00000147A';
-  const rentalUrl = `https://imole.fr/?kiosk=${kioskId}`;
+  const kioskParam = searchParams.get('kiosk');
+  
+  // If a kiosk parameter is present, encode it in the QR so user's phone knows which station to unlock;
+  // otherwise default to standard imole.fr
+  const rentalUrl = kioskParam ? `https://imole.fr/?kiosk=${kioskParam}` : 'https://imole.fr';
 
   return (
     <main style={{ 
@@ -28,7 +32,7 @@ function KioskContent() {
       overflow: 'hidden',
       position: 'relative',
     }}>
-      {/* Decorative ambient background glows */}
+      {/* Ambient background glow */}
       <div style={{
         position: 'absolute',
         top: '-10%',
@@ -40,29 +44,35 @@ function KioskContent() {
         pointerEvents: 'none',
       }} />
 
-      {/* Left side: Hero & French Institutional Trust */}
+      {/* Left side: Hero & Information */}
       <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', gap: '2rem', zIndex: 1 }}>
-        {/* Top Branding & Station Indicator */}
+        {/* Top Branding & Status Indicator */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <ImoleLogo size="lg" light={true} />
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.6rem',
-            background: 'rgba(255, 255, 255, 0.1)',
-            padding: '0.5rem 1rem',
-            borderRadius: '9999px',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            fontSize: '0.85rem',
-            fontWeight: 700,
-            backdropFilter: 'blur(10px)',
-          }}>
-            <span className="live-dot" />
-            <span>Station #{kioskId} • En Ligne</span>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.6rem',
+              background: 'rgba(255, 255, 255, 0.1)',
+              padding: '0.5rem 1rem',
+              borderRadius: '9999px',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              backdropFilter: 'blur(10px)',
+            }}>
+              <span className="live-dot" />
+              <span>{t('stationOnline')}</span>
+            </div>
+
+            {/* Kiosk Language Switcher */}
+            <LanguageToggle variant="dark" />
           </div>
         </div>
 
-        {/* Catchphrase from Renderings */}
+        {/* Catchphrase & Subtitle */}
         <div>
           <div style={{
             display: 'inline-block',
@@ -77,7 +87,7 @@ function KioskContent() {
             textTransform: 'uppercase',
             marginBottom: '1rem',
           }}>
-            Énergie Nomade &amp; Écoresponsable
+            {t('portableEnergyTag')}
           </div>
 
           <h1 style={{ 
@@ -87,10 +97,10 @@ function KioskContent() {
             letterSpacing: '-0.02em',
             color: '#FFFFFF' 
           }}>
-            Scannez <span style={{ color: '#FFA751' }}>|</span> Payez <span style={{ color: '#FFA751' }}>|</span> Chargez
+            {t('kioskTagline')}
           </h1>
           <p style={{ fontSize: '1.4rem', color: 'rgba(255, 255, 255, 0.75)', marginTop: '0.75rem', fontWeight: 500 }}>
-            Batterie faible ? Emportez une batterie universelle en 30 secondes.
+            {t('kioskSubtitle')}
           </p>
         </div>
 
@@ -105,13 +115,13 @@ function KioskContent() {
             backdropFilter: 'blur(10px)',
           }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgba(255, 255, 255, 0.6)', textTransform: 'uppercase' }}>
-              Tarif sans engagement
+              {t('kioskTarifTitle')}
             </span>
             <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#FFFFFF', margin: '0.2rem 0' }}>
-              2,49 € <span style={{ fontSize: '0.85rem', fontWeight: 500, color: '#FFA751' }}>(1ère heure incluse)</span>
+              {t('kioskTarifMain')}
             </div>
             <span style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.7)' }}>
-              puis 1,99 € / h • Plafond 24h : 12,99 €
+              {t('kioskTarifSub')}
             </span>
           </div>
 
@@ -124,18 +134,18 @@ function KioskContent() {
             backdropFilter: 'blur(10px)',
           }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgba(255, 255, 255, 0.6)', textTransform: 'uppercase' }}>
-              Compatibilité Universelle
+              {t('kioskCompatTitle')}
             </span>
             <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#FFFFFF', margin: '0.35rem 0' }}>
               3 câbles intégrés
             </div>
             <span style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.7)' }}>
-              iPhone (Lightning) • USB-C • Micro-USB
+              {t('kioskCompatSub')}
             </span>
           </div>
         </div>
 
-        {/* Institutional French Badges */}
+        {/* Trust Badges */}
         <div style={{ marginTop: '0.5rem' }}>
           <TrustBadges variant="dark" />
         </div>
@@ -177,10 +187,10 @@ function KioskContent() {
               fontWeight: 800, 
               fontSize: '0.95rem' 
             }}>
-              Scannez pour déverrouiller
+              {t('kioskScanPill')}
             </span>
             <p style={{ fontSize: '0.8rem', color: '#6B7280', marginTop: '0.5rem' }}>
-              Apple Pay • Google Pay • Carte Bancaire
+              {t('kioskPaymentPill')}
             </p>
           </div>
         </div>

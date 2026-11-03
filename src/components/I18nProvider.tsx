@@ -4,97 +4,210 @@ import React, { createContext, useContext, useState } from 'react';
 
 type Lang = 'fr' | 'en';
 
-type TranslationKeys = 
+export type TranslationKey =
+  // Common & Header
   | 'welcome'
-  | 'nearestStation'
   | 'stationOnline'
   | 'cablesIncluded'
+  | 'portableEnergyTag'
+  
+  // Kiosk Attract Screen
+  | 'kioskTagline'
+  | 'kioskSubtitle'
+  | 'kioskTarifTitle'
+  | 'kioskTarifMain'
+  | 'kioskTarifSub'
+  | 'kioskCompatTitle'
+  | 'kioskCompatSub'
+  | 'kioskScanPill'
+  | 'kioskPaymentPill'
+  | 'kioskInstruction'
+  
+  // Mobile Rental Landing Page
+  | 'heroTitle'
+  | 'kioskCardTitle'
+  | 'kioskCardSubtitle'
   | 'pricingHeader'
   | 'pricing1stHour'
+  | 'pricing1stHourLabel'
   | 'pricingSubsequent'
+  | 'pricingSubsequentLabel'
   | 'pricingDayCap'
-  | 'pricingDeposit'
-  | 'depositNotice'
+  | 'pricingDayCapLabel'
+  | 'depositNoticeTitle'
+  | 'depositNoticeText'
   | 'termsConsent'
-  | 'rentNow'
-  | 'activeRental'
-  | 'liveTimer'
-  | 'currentCharge'
+  | 'unlockBtn'
+  | 'unlocking'
+  
+  // Active Rental Screen
+  | 'activeRentalTitle'
+  | 'activeStatus'
+  | 'liveTimerLabel'
+  | 'chargingStatus'
+  | 'currentCostLabel'
+  | 'costExplain'
   | 'howToReturnTitle'
-  | 'step1'
-  | 'step2'
-  | 'step3'
-  | 'returnKioskBtn'
+  | 'returnStep1'
+  | 'returnStep2'
+  | 'returnStep3'
+  | 'testReturnBtn'
+  
+  // Receipt Screen
   | 'receiptTitle'
-  | 'rentalCompleted'
-  | 'totalDuration'
-  | 'totalPaid'
-  | 'holdReleased'
-  | 'downloadReceipt';
+  | 'receiptSuccess'
+  | 'receiptThanks'
+  | 'finalChargedLabel'
+  | 'holdReleasedBadge'
+  | 'durationLabel'
+  | 'paymentMethodLabel'
+  | 'initialHoldLabel'
+  | 'amountReleasedLabel'
+  | 'backHomeBtn'
+  
+  // Trust Badges
+  | 'trustSecurity'
+  | 'trustBattery'
+  | 'trustDeposit';
 
-const translations: Record<Lang, Record<TranslationKeys, string>> = {
+const translations: Record<Lang, Record<TranslationKey, string>> = {
   fr: {
     welcome: "BIENVENUE !",
-    nearestStation: "Station IMỌLẸ sélectionnée",
-    stationOnline: "Station en ligne • Batteries prêtes à l'emploi",
+    stationOnline: "Borne Active • Prête à l'emploi",
     cablesIncluded: "3 câbles intégrés : Lightning (iPhone) • USB-C • Micro-USB",
+    portableEnergyTag: "Énergie Nomade & Écoresponsable",
+
+    // Kiosk Screen
+    kioskTagline: "Scannez | Payez | Chargez",
+    kioskSubtitle: "Batterie faible ? Emportez une batterie universelle en 30 secondes.",
+    kioskTarifTitle: "Tarif sans engagement",
+    kioskTarifMain: "2,49 € (1ère heure incluse)",
+    kioskTarifSub: "puis 1,99 € / h • Plafond 24h : 12,99 €",
+    kioskCompatTitle: "Compatibilité Universelle",
+    kioskCompatSub: "iPhone (Lightning) • USB-C • Micro-USB",
+    kioskScanPill: "Scannez pour déverrouiller",
+    kioskPaymentPill: "Apple Pay • Google Pay • Carte Bancaire",
+    kioskInstruction: "Scannez avec l'appareil photo de votre smartphone",
+
+    // Mobile Landing
+    heroTitle: "Rechargez en toute liberté",
+    kioskCardTitle: "Borne IMỌLẸ",
+    kioskCardSubtitle: "Batteries disponibles • 100% chargées",
     pricingHeader: "TARIFICATION TRANSPARENTE",
     pricing1stHour: "2,49 €",
-    pricingSubsequent: "1,99 € / h",
-    pricingDayCap: "12,99 € / 24h",
-    pricingDeposit: "24,99 €",
-    depositNotice: "Empreinte bancaire de 24,99 € bloquée temporairement, ajustée automatiquement lors du retour.",
-    termsConsent: "J'accepte les Conditions Générales d'Utilisation et la retenue temporaire.",
-    rentNow: "Déverrouiller une batterie",
-    activeRental: "Location en cours",
-    liveTimer: "Temps écoulé",
-    currentCharge: "Montant estimé",
+    pricing1stHourLabel: "Déverrouillage + 1h",
+    pricingSubsequent: "1,99 €",
+    pricingSubsequentLabel: "Par heure suppl.",
+    pricingDayCap: "12,99 €",
+    pricingDayCapLabel: "Plafond 24h",
+    depositNoticeTitle: "Empreinte bancaire de 24,99 €",
+    depositNoticeText: "Garantie temporaire non débitée. Seul le temps réel consommé sera prélevé lors de la restitution.",
+    termsConsent: "J'accepte les Conditions Générales d'Utilisation et l'empreinte temporaire.",
+    unlockBtn: "Déverrouiller avec Apple Pay / CB",
+    unlocking: "Connexion à la borne...",
+
+    // Active Screen
+    activeRentalTitle: "Location en cours",
+    activeStatus: "Location Active",
+    liveTimerLabel: "Temps écoulé",
+    chargingStatus: "● Batterie en cours d'utilisation",
+    currentCostLabel: "Coût estimé actuel :",
+    costExplain: "1ère heure incluse • Plafond 24h bloqué à 12,99 €",
     howToReturnTitle: "Comment restituer votre batterie ?",
-    step1: "1. Repérez n'importe quelle borne IMỌLẸ en France",
-    step2: "2. Glissez fermement la batterie dans un slot libre",
-    step3: "3. Attendez le clic : votre caution est instantanément libérée",
-    returnKioskBtn: "Trouver une borne de retour",
+    returnStep1: "Présentez-vous devant n'importe quelle borne IMỌLẸ.",
+    returnStep2: "Insérez la batterie dans n'importe quel slot libre jusqu'au clic.",
+    returnStep3: "La caution est immédiatement débloquée sur votre carte.",
+    testReturnBtn: "Tester la restitution de batterie (Simulation)",
+
+    // Receipt Screen
     receiptTitle: "Reçu de Location",
-    rentalCompleted: "Batterie restituée avec succès !",
-    totalDuration: "Durée totale",
-    totalPaid: "Montant débité",
-    holdReleased: "Reste de caution libéré",
-    downloadReceipt: "Télécharger la facture PDF",
+    receiptSuccess: "Batterie restituée !",
+    receiptThanks: "Merci d'avoir utilisé le réseau IMỌLẸ.",
+    finalChargedLabel: "Montant final débité",
+    holdReleasedBadge: "Caution restante libérée",
+    durationLabel: "Durée de location :",
+    paymentMethodLabel: "Moyen de paiement :",
+    initialHoldLabel: "Empreinte initiale :",
+    amountReleasedLabel: "Reste débloqué sur votre compte :",
+    backHomeBtn: "Retour à l'accueil",
+
+    // Trust
+    trustSecurity: "Paiement Sécurisé SSL",
+    trustBattery: "Batteries Certifiées CE",
+    trustDeposit: "Caution Débloquée au Retour",
   },
   en: {
     welcome: "WELCOME!",
-    nearestStation: "Selected IMỌLẸ Station",
-    stationOnline: "Station Online • Batteries fully charged",
+    stationOnline: "Station Active • Ready to Use",
     cablesIncluded: "3 built-in cables: Lightning (iPhone) • USB-C • Micro-USB",
+    portableEnergyTag: "Portable & Sustainable Energy",
+
+    // Kiosk Screen
+    kioskTagline: "Scan | Pay | Charge",
+    kioskSubtitle: "Low battery? Take a universal power bank in 30 seconds.",
+    kioskTarifTitle: "No Commitment Pricing",
+    kioskTarifMain: "€2.49 (1st hour included)",
+    kioskTarifSub: "then €1.99 / hr • 24h Cap: €12.99",
+    kioskCompatTitle: "Universal Compatibility",
+    kioskCompatSub: "iPhone (Lightning) • USB-C • Micro-USB",
+    kioskScanPill: "Scan to Unlock",
+    kioskPaymentPill: "Apple Pay • Google Pay • Credit Card",
+    kioskInstruction: "Scan with your smartphone camera",
+
+    // Mobile Landing
+    heroTitle: "Charge On The Go",
+    kioskCardTitle: "IMỌLẸ Station",
+    kioskCardSubtitle: "Batteries available • 100% charged",
     pricingHeader: "TRANSPARENT PRICING",
     pricing1stHour: "€2.49",
-    pricingSubsequent: "€1.99 / hr",
-    pricingDayCap: "€12.99 / 24hrs",
-    pricingDeposit: "€24.99",
-    depositNotice: "A temporary €24.99 pre-authorization hold is placed on your card and automatically released upon return.",
+    pricing1stHourLabel: "Unlock + 1st hour",
+    pricingSubsequent: "€1.99",
+    pricingSubsequentLabel: "Per add. hour",
+    pricingDayCap: "€12.99",
+    pricingDayCapLabel: "24h Max Cap",
+    depositNoticeTitle: "Temporary €24.99 hold",
+    depositNoticeText: "A security hold placed on your card. You are only charged for actual rental time when you return.",
     termsConsent: "I accept the Terms of Service and temporary pre-authorization hold.",
-    rentNow: "Unlock a Power Bank",
-    activeRental: "Active Rental",
-    liveTimer: "Elapsed Time",
-    currentCharge: "Current Charge",
+    unlockBtn: "Unlock with Apple Pay / Card",
+    unlocking: "Connecting to station...",
+
+    // Active Screen
+    activeRentalTitle: "Active Rental",
+    activeStatus: "Active Rental",
+    liveTimerLabel: "Elapsed Time",
+    chargingStatus: "● Battery currently in use",
+    currentCostLabel: "Current Estimated Cost:",
+    costExplain: "1st hour included • 24h max cost capped at €12.99",
     howToReturnTitle: "How to return your power bank?",
-    step1: "1. Find any IMỌLẸ station in France",
-    step2: "2. Push the battery into an empty slot",
-    step3: "3. Wait for the click: your hold is instantly released",
-    returnKioskBtn: "Find return station",
+    returnStep1: "Walk up to any IMỌLẸ station in the network.",
+    returnStep2: "Push the battery into any empty slot until it clicks.",
+    returnStep3: "Your deposit hold is immediately released back to your card.",
+    testReturnBtn: "Simulate Return (Demo)",
+
+    // Receipt Screen
     receiptTitle: "Rental Receipt",
-    rentalCompleted: "Battery successfully returned!",
-    totalDuration: "Total Duration",
-    totalPaid: "Amount Charged",
-    holdReleased: "Remaining Hold Released",
-    downloadReceipt: "Download PDF Invoice",
+    receiptSuccess: "Battery Returned!",
+    receiptThanks: "Thank you for using IMỌLẸ Power Network.",
+    finalChargedLabel: "Final Amount Charged",
+    holdReleasedBadge: "Remaining Deposit Released",
+    durationLabel: "Rental Duration:",
+    paymentMethodLabel: "Payment Method:",
+    initialHoldLabel: "Initial Hold:",
+    amountReleasedLabel: "Released back to your account:",
+    backHomeBtn: "Back to Home",
+
+    // Trust
+    trustSecurity: "SSL 256-bit Encrypted",
+    trustBattery: "CE Certified Batteries",
+    trustDeposit: "Hold Released on Return",
   }
 };
 
 type I18nContextType = {
   lang: Lang;
-  t: (key: TranslationKeys) => string;
+  setLanguage: (lang: Lang) => void;
   toggleLang: () => void;
+  t: (key: TranslationKey) => string;
 };
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
@@ -103,38 +216,19 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLang] = useState<Lang>('fr');
 
   const toggleLang = () => {
-    setLang(prev => prev === 'fr' ? 'en' : 'fr');
+    setLang(prev => (prev === 'fr' ? 'en' : 'fr'));
   };
 
-  const t = (key: TranslationKeys) => {
-    return translations[lang][key] || key;
+  const setLanguage = (newLang: Lang) => {
+    setLang(newLang);
+  };
+
+  const t = (key: TranslationKey) => {
+    return translations[lang]?.[key] || key;
   };
 
   return (
-    <I18nContext.Provider value={{ lang, t, toggleLang }}>
-      <div style={{ position: 'fixed', top: 16, right: 16, zIndex: 100 }}>
-        <button 
-          onClick={toggleLang} 
-          style={{ 
-            padding: '6px 12px', 
-            borderRadius: '9999px', 
-            border: '1px solid rgba(48, 14, 88, 0.15)', 
-            background: 'rgba(255, 255, 255, 0.9)', 
-            backdropFilter: 'blur(10px)',
-            color: '#300E58',
-            fontWeight: 700,
-            fontSize: '12px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px'
-          }}
-        >
-          <span>🌐</span>
-          <span>{lang === 'fr' ? 'English' : 'Français'}</span>
-        </button>
-      </div>
+    <I18nContext.Provider value={{ lang, setLanguage, toggleLang, t }}>
       {children}
     </I18nContext.Provider>
   );
