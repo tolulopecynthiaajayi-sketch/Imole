@@ -49,3 +49,4 @@ if (!getApps().length) {
 }
 
 export const db = getFirestore();
+
