@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-color: #FFFFFF;
+  --text-primary: #111111;
+  --text-secondary: #666666;
+  --primary-brand: #4B0082;
+  --primary-hover: #3A0065;
+  --surface-color: #F8F9FA;
+  --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.08);
+  --shadow-medium: 0 10px 40px rgba(75, 0, 130, 0.15);
+  --border-radius: 16px;
+  --border-radius-pill: 9999px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+.btn-primary {
+  background-color: var(--primary-brand);
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 1.125rem;
+  padding: 1rem 2rem;
+  border-radius: var(--border-radius-pill);
+  box-shadow: var(--shadow-medium);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 45px rgba(75, 0, 130, 0.25);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.card {
+  background: #FFFFFF;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-soft);
+  padding: 1.5rem;
+  border: 1px solid #EBEBEB;
+}
+
+.logo-placeholder {
+  width: 120px;
+  height: 40px;
+  background: linear-gradient(135deg, #4B0082, #FFD700);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 0.8rem;
+  margin: 0 auto 2rem auto;
+}
+
+.page-container {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.text-center { text-align: center; }
+.mt-4 { margin-top: 1rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.text-muted { color: var(--text-secondary); }
+.text-bold { font-weight: 700; }
+.text-sm { font-size: 0.875rem; }
+.text-lg { font-size: 1.125rem; }
+.text-xl { font-size: 1.5rem; }
+.text-2xl { font-size: 2rem; }
+.text-brand { color: var(--primary-brand); }

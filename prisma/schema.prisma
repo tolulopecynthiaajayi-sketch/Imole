@@ -1,0 +1,45 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  user_id              String        @id @default(uuid())
+  stripe_customer_id   String?
+  active_rental_status Boolean       @default(false)
+  transactions         Transaction[]
+}
+
+model Kiosk {
+  kiosk_id            String    @id @default(uuid())
+  location_name       String
+  online_status       Boolean   @default(true)
+  available_batteries Int       @default(0)
+  empty_slots         Int       @default(0)
+  batteries           Battery[]
+}
+
+model Battery {
+  battery_id       String        @id
+  current_kiosk_id String?
+  status           String        @default("AVAILABLE") // "AVAILABLE", "RENTED", "LOST"
+  kiosk            Kiosk?        @relation(fields: [current_kiosk_id], references: [kiosk_id])
+  transactions     Transaction[]
+}
+
+model Transaction {
+  transaction_id      String    @id @default(uuid())
+  user_id             String
+  battery_id          String
+  start_time          DateTime  @default(now())
+  end_time            DateTime?
+  pre_auth_id         String?
+  final_charge_amount Float?
+  status              String    @default("PRE_AUTH_SUCCESS") // "PRE_AUTH_SUCCESS", "COMPLETED", "FAILED", "LOST"
+  user                User      @relation(fields: [user_id], references: [user_id])
+  battery             Battery   @relation(fields: [battery_id], references: [battery_id])
+}
