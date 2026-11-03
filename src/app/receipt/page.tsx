@@ -1,46 +1,124 @@
 "use client";
 
 import { useI18n } from '@/components/I18nProvider';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
+import ImoleLogo from '@/components/ImoleLogo';
+import BottomNav from '@/components/BottomNav';
 
-export default function ReceiptScreen() {
+function ReceiptContent() {
   const { t } = useI18n();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  const durationMinutes = searchParams.get('duration') || '42';
+  const finalCost = searchParams.get('cost') || '2,49';
+  const kioskId = searchParams.get('kiosk') || 'H00000147A';
 
-  // Hardcoded for demo purposes
-  const totalTime = "00:45:12";
-  const finalCharge = 2.49;
-  const holdAmount = 24.99;
-  const amountReleased = holdAmount - finalCharge;
+  // Calculate hold released
+  const costFloat = parseFloat(finalCost.replace(',', '.')) || 2.49;
+  const holdReleased = (24.99 - costFloat).toFixed(2).replace('.', ',');
 
   return (
-    <main className="page-container" style={{ justifyContent: 'center' }}>
-      <div className="logo-placeholder">IMỌLẸ Logo</div>
-      
-      <div className="card text-center mb-4">
-        <h2 className="text-xl text-bold mb-4">{t('receipt')}</h2>
-        
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-          <span className="text-muted">{t('totalTime')}</span>
-          <span className="text-bold">{totalTime}</span>
+    <div className="page-container animate-slide-up">
+      {/* Brand Header */}
+      <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+        <ImoleLogo size="md" />
+      </header>
+
+      {/* Success Badge */}
+      <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+        <div style={{
+          width: '68px',
+          height: '68px',
+          borderRadius: '50%',
+          backgroundColor: '#ECFDF5',
+          color: '#059669',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '2rem',
+          margin: '0 auto 1rem auto',
+          boxShadow: '0 8px 24px rgba(5, 150, 105, 0.15)',
+        }}>
+          ✓
         </div>
-        
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-          <span className="text-muted">{t('finalCharge')}</span>
-          <span className="text-bold text-brand">€{finalCharge.toFixed(2)}</span>
-        </div>
-        
-        <hr style={{ borderTop: '1px solid #EBEBEB', margin: '1rem 0' }} />
-        
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span className="text-muted">{t('amountReleased')}</span>
-          <span className="text-bold text-green" style={{ color: '#28a745' }}>€{amountReleased.toFixed(2)}</span>
-        </div>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#111827' }}>
+          Batterie restituée !
+        </h1>
+        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+          Merci d&apos;avoir utilisé le réseau IMỌLẸ.
+        </p>
       </div>
 
-      <button className="btn-primary" onClick={() => router.push('/')}>
-        Done
-      </button>
-    </main>
+      {/* Main Receipt Card */}
+      <section className="fintech-card" style={{ marginBottom: '1.5rem' }}>
+        <div style={{ textAlign: 'center', paddingBottom: '1.25rem', borderBottom: '1px dashed #E5E7EB', marginBottom: '1.25rem' }}>
+          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            Montant final débité
+          </span>
+          <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--primary-brand)', margin: '0.25rem 0' }}>
+            {finalCost} €
+          </div>
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.35rem',
+            padding: '0.35rem 0.75rem',
+            borderRadius: '9999px',
+            backgroundColor: '#ECFDF5',
+            color: '#059669',
+            fontSize: '0.75rem',
+            fontWeight: 700,
+          }}>
+            <span>✓</span> Caution restante libérée : {holdReleased} €
+          </span>
+        </div>
+
+        {/* Detailed Breakdown */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', fontSize: '0.82rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: 'var(--text-muted)' }}>Durée de location :</span>
+            <strong>{durationMinutes} minutes</strong>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: 'var(--text-muted)' }}>Borne de restitution :</span>
+            <strong>Station #{kioskId}</strong>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: 'var(--text-muted)' }}>Moyen de paiement :</span>
+            <strong>Apple Pay / Carte</strong>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: 'var(--text-muted)' }}>Empreinte initiale :</span>
+            <span>24,99 €</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', color: '#059669', fontWeight: 700 }}>
+            <span>Reste débloqué sur votre compte :</span>
+            <span>+ {holdReleased} €</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Primary Action Button */}
+      <section style={{ marginBottom: '1.5rem' }}>
+        <button 
+          className="btn-primary-action"
+          onClick={() => router.push('/')}
+        >
+          Retour à l&apos;accueil
+        </button>
+      </section>
+
+      <BottomNav activeTab="history" />
+    </div>
+  );
+}
+
+export default function ReceiptScreen() {
+  return (
+    <Suspense fallback={<div className="page-container">Chargement...</div>}>
+      <ReceiptContent />
+    </Suspense>
   );
 }
