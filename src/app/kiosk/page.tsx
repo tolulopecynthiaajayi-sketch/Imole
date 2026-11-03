@@ -3,7 +3,7 @@
 import { useI18n } from '@/components/I18nProvider';
 import { useSearchParams } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
-import { Suspense } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import ImoleLogo from '@/components/ImoleLogo';
 import LanguageToggle from '@/components/LanguageToggle';
 
@@ -12,9 +12,27 @@ function KioskDisplay() {
   const searchParams = useSearchParams();
   const kioskParam = searchParams.get('kiosk');
   
-  // Dynamic or static URL
   const rentalUrl = kioskParam ? `https://imole.fr/?kiosk=${kioskParam}` : 'https://imole.fr';
   const isFr = lang === 'fr';
+
+  // Animated Battery Cycle (loops from 5% red to 100% green)
+  const [chargeLevel, setChargeLevel] = useState(5);
+  const [isCharging, setIsCharging] = useState(false);
+
+  useEffect(() => {
+    const cycle = setInterval(() => {
+      setIsCharging(true);
+      setChargeLevel(prev => {
+        if (prev >= 100) {
+          setIsCharging(false);
+          return 5;
+        }
+        return Math.min(100, prev + 25);
+      });
+    }, 1200);
+
+    return () => clearInterval(cycle);
+  }, []);
 
   return (
     <div style={{
@@ -23,150 +41,266 @@ function KioskDisplay() {
       maxWidth: '100vw',
       maxHeight: '100vh',
       overflow: 'hidden',
-      background: 'radial-gradient(circle at 20% 30%, #350A5E 0%, #1A0430 55%, #0D021A 100%)',
+      backgroundColor: '#120224',
+      backgroundImage: `
+        radial-gradient(circle at 15% 20%, rgba(75, 0, 130, 0.45) 0%, transparent 55%),
+        radial-gradient(circle at 85% 80%, rgba(255, 170, 0, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(48, 14, 88, 0.6) 0%, transparent 70%)
+      `,
       color: '#FFFFFF',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
-      padding: '2.4vw 3.8vw',
+      padding: '2.5vw 4.2vw',
       position: 'relative',
       fontFamily: "'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif",
       boxSizing: 'border-box',
     }}>
-      {/* Ambient background glows */}
-      <div style={{
-        position: 'absolute',
-        top: '-15%',
-        left: '25%',
-        width: '45vw',
-        height: '45vw',
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(255, 170, 0, 0.12) 0%, transparent 65%)',
-        filter: 'blur(40px)',
-        pointerEvents: 'none',
-      }} />
+      {/* Dynamic Keyframe Styles */}
+      <style jsx>{`
+        @keyframes laserSweep {
+          0% {
+            top: 0%;
+            opacity: 0;
+          }
+          15% {
+            opacity: 1;
+          }
+          85% {
+            opacity: 1;
+          }
+          100% {
+            top: 100%;
+            opacity: 0;
+          }
+        }
 
-      <div style={{
-        position: 'absolute',
-        bottom: '-20%',
-        right: '10%',
-        width: '50vw',
-        height: '50vw',
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(147, 51, 234, 0.18) 0%, transparent 70%)',
-        filter: 'blur(50px)',
-        pointerEvents: 'none',
-      }} />
+        @keyframes auraGlow {
+          0%, 100% {
+            opacity: 0.35;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.65;
+            transform: scale(1.08);
+          }
+        }
 
-      {/* TOP BAR: Logo + Live Pulse + Touch Language Toggle */}
+        @keyframes floatLevitate {
+          0%, 100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-8px);
+          }
+        }
+
+        @keyframes pulseDot {
+          0%, 100% {
+            box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6);
+          }
+          50% {
+            box-shadow: 0 0 0 8px rgba(52, 211, 153, 0);
+          }
+        }
+
+        .laser-line {
+          position: absolute;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background: linear-gradient(90deg, transparent 0%, #FFB800 50%, transparent 100%);
+          box-shadow: 0 0 14px #FFB800, 0 0 24px rgba(255, 184, 0, 0.8);
+          animation: laserSweep 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+          pointer-events: none;
+          z-index: 20;
+        }
+
+        .ambient-aura {
+          animation: auraGlow 6s ease-in-out infinite;
+        }
+
+        .floating-element {
+          animation: floatLevitate 4s ease-in-out infinite;
+        }
+
+        .live-pulse-dot {
+          animation: pulseDot 2s infinite ease-in-out;
+        }
+      `}</style>
+
+      {/* Floating Background Ambient Lighting Orbs */}
+      <div 
+        className="ambient-aura"
+        style={{
+          position: 'absolute',
+          top: '-15%',
+          left: '20%',
+          width: '50vw',
+          height: '50vw',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(255, 184, 0, 0.16) 0%, transparent 60%)',
+          filter: 'blur(50px)',
+          pointerEvents: 'none',
+        }} 
+      />
+
+      <div 
+        className="ambient-aura"
+        style={{
+          position: 'absolute',
+          bottom: '-25%',
+          right: '15%',
+          width: '55vw',
+          height: '55vw',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(147, 51, 234, 0.22) 0%, transparent 65%)',
+          filter: 'blur(60px)',
+          pointerEvents: 'none',
+          animationDelay: '-3s',
+        }} 
+      />
+
+      {/* 1. TOP BAR: Editorial Logo + Status Indicator + Language Toggle */}
       <header style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         zIndex: 10,
-        height: '48px',
+        height: '52px',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.2vw' }}>
           <ImoleLogo size="lg" light={true} />
-          <div style={{
-            height: '24px',
-            width: '1px',
-            background: 'rgba(255, 255, 255, 0.2)',
-          }} />
+          <div style={{ height: '22px', width: '1px', background: 'rgba(255, 255, 255, 0.2)' }} />
           <span style={{
             fontSize: '0.85vw',
-            letterSpacing: '0.12em',
+            letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            color: 'rgba(255, 255, 255, 0.65)',
+            color: 'rgba(255, 255, 255, 0.6)',
             fontWeight: 700,
           }}>
             {isFr ? 'Réseau d\'énergie partagée' : 'Power Bank Sharing Network'}
           </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.2vw' }}>
-          {/* Live Online Badge */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.4vw' }}>
+          {/* Subtle Live Beacon */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.5vw',
-            background: 'rgba(16, 185, 129, 0.12)',
-            border: '1px solid rgba(16, 185, 129, 0.35)',
-            padding: '0.4vw 1vw',
-            borderRadius: '9999px',
+            gap: '0.55vw',
             fontSize: '0.85vw',
             fontWeight: 700,
             color: '#34D399',
-            backdropFilter: 'blur(10px)',
           }}>
-            <span style={{
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              backgroundColor: '#10B981',
-              boxShadow: '0 0 10px #10B981',
-            }} />
-            <span>{isFr ? 'Borne Prête • 100% Chargée' : 'Station Ready • 100% Charged'}</span>
+            <span 
+              className="live-pulse-dot"
+              style={{
+                width: '9px',
+                height: '9px',
+                borderRadius: '50%',
+                backgroundColor: '#10B981',
+                display: 'inline-block',
+              }} 
+            />
+            <span>{isFr ? 'Borne Prête • Batteries 100%' : 'Station Ready • 100% Charged'}</span>
           </div>
 
-          {/* Touch-Friendly FR/EN Toggle */}
+          {/* Smooth Touch Language Toggle */}
           <LanguageToggle variant="dark" />
         </div>
       </header>
 
-      {/* CENTER CONTENT GRID (16:10 Landscape Ratio - 60% Left / 40% Right) */}
+      {/* 2. MAIN CENTER HERO: Pure Visual Magnetism (No Nested Boxes) */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flex: 1,
-        gap: '4vw',
+        gap: '4.5vw',
         zIndex: 5,
-        margin: '1.5vw 0',
+        margin: '1.2vw 0',
       }}>
-        {/* LEFT COLUMN: The Hook & Value Proposition */}
+        
+        {/* LEFT COLUMN: Emotional Hook & Dynamic Energy Loop */}
         <div style={{
           flex: 1.35,
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          gap: '1.6vw',
+          gap: '1.8vw',
         }}>
-          {/* Catchphrase Pill */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6vw' }}>
-            <span style={{
-              background: 'linear-gradient(135deg, rgba(255, 184, 0, 0.2) 0%, rgba(255, 115, 0, 0.25) 100%)',
-              border: '1px solid rgba(255, 184, 0, 0.5)',
-              color: '#FFB800',
-              padding: '0.35vw 0.9vw',
-              borderRadius: '9999px',
-              fontSize: '0.8vw',
-              fontWeight: 800,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
+          
+          {/* Animated Battery Surging Indicator */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.2vw' }}>
+            {/* The Live Battery Capsule */}
+            <div style={{
+              width: '68px',
+              height: '32px',
+              borderRadius: '9px',
+              border: '2.5px solid rgba(255, 255, 255, 0.85)',
+              padding: '3px',
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
             }}>
-              ⚡ 5000 mAh Fast Charge
-            </span>
-            <span style={{
-              background: 'rgba(255, 255, 255, 0.08)',
-              color: 'rgba(255, 255, 255, 0.85)',
-              padding: '0.35vw 0.9vw',
-              borderRadius: '9999px',
-              fontSize: '0.8vw',
-              fontWeight: 600,
-              backdropFilter: 'blur(10px)',
-            }}>
-              {isFr ? 'Tous câbles intégrés' : 'All cables built-in'}
-            </span>
+              {/* Positive Battery Terminal Tip */}
+              <div style={{
+                position: 'absolute',
+                right: '-6px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: '4px',
+                height: '14px',
+                borderRadius: '0 3px 3px 0',
+                backgroundColor: 'rgba(255, 255, 255, 0.85)',
+              }} />
+
+              {/* Dynamic Fill Meter */}
+              <div style={{
+                height: '100%',
+                width: `${chargeLevel}%`,
+                borderRadius: '4px',
+                background: chargeLevel < 30
+                  ? 'linear-gradient(90deg, #EF4444, #F87171)'
+                  : 'linear-gradient(90deg, #10B981, #34D399)',
+                boxShadow: chargeLevel < 30
+                  ? '0 0 12px rgba(239, 68, 68, 0.7)'
+                  : '0 0 14px rgba(52, 211, 153, 0.8)',
+                transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s ease',
+              }} />
+            </div>
+
+            {/* Percentage & Surge Text */}
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4vw' }}>
+              <span style={{
+                fontSize: '1.6vw',
+                fontWeight: 800,
+                color: chargeLevel < 30 ? '#F87171' : '#34D399',
+                fontVariantNumeric: 'tabular-nums',
+                transition: 'color 0.4s ease',
+              }}>
+                {chargeLevel}%
+              </span>
+              <span style={{
+                fontSize: '0.85vw',
+                fontWeight: 700,
+                color: '#FFB800',
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+              }}>
+                {isCharging ? '⚡ Charge Ultra-Rapide' : '⚡ 5000 mAh'}
+              </span>
+            </div>
           </div>
 
-          {/* Main Magnet Headline */}
+          {/* Main Cinematic Headline */}
           <div>
             <h1 style={{
-              fontSize: '3.6vw',
+              fontSize: '4.2vw',
               fontWeight: 800,
               lineHeight: 1.05,
-              letterSpacing: '-0.03em',
+              letterSpacing: '-0.035em',
               margin: 0,
             }}>
               {isFr ? (
@@ -176,6 +310,7 @@ function KioskDisplay() {
                     background: 'linear-gradient(135deg, #FFB800 0%, #FFA000 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
+                    textShadow: '0 0 35px rgba(255, 184, 0, 0.35)',
                   }}>100%</span> en 1 clic.
                 </>
               ) : (
@@ -185,232 +320,226 @@ function KioskDisplay() {
                     background: 'linear-gradient(135deg, #FFB800 0%, #FFA000 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
+                    textShadow: '0 0 35px rgba(255, 184, 0, 0.35)',
                   }}>100%</span> in 1 click.
                 </>
               )}
             </h1>
 
             <p style={{
-              fontSize: '1.25vw',
+              fontSize: '1.35vw',
               color: 'rgba(255, 255, 255, 0.75)',
-              marginTop: '0.8vw',
+              marginTop: '0.9vw',
               fontWeight: 500,
-              lineHeight: 1.3,
+              lineHeight: 1.35,
+              maxWidth: '92%',
             }}>
               {isFr 
-                ? 'Emportez une batterie universelle et déposez-la dans n\'importe quelle borne.'
-                : 'Take a universal power bank and return it to any station in the city.'}
+                ? 'Emportez une batterie universelle. Déposez-la dans n\'importe quelle borne en France.'
+                : 'Take a universal power bank with you. Return it to any station across France.'}
             </p>
           </div>
 
-          {/* 3 Steps Action Bar */}
+          {/* Connected Flow Timeline (Fluid, No Boxes) */}
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '1vw',
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '1.2vw',
-            padding: '1vw 1.2vw',
-            backdropFilter: 'blur(15px)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1.2vw',
+            paddingTop: '0.4vw',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.7vw' }}>
+            {/* Step 1 */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6vw' }}>
               <span style={{
-                width: '2vw',
-                height: '2vw',
+                width: '1.8vw',
+                height: '1.8vw',
                 borderRadius: '50%',
-                background: 'rgba(255, 184, 0, 0.2)',
+                background: 'rgba(255, 184, 0, 0.25)',
                 color: '#FFB800',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontWeight: 800,
-                fontSize: '0.9vw',
-                flexShrink: 0,
+                fontSize: '0.85vw',
               }}>
                 1
               </span>
-              <div>
-                <strong style={{ display: 'block', fontSize: '0.9vw', color: '#FFFFFF' }}>
-                  {isFr ? 'Scannez le QR' : 'Scan the QR'}
-                </strong>
-                <span style={{ fontSize: '0.72vw', color: 'rgba(255, 255, 255, 0.6)' }}>
-                  {isFr ? 'Appareil photo' : 'Phone camera'}
-                </span>
-              </div>
+              <span style={{ fontSize: '1vw', fontWeight: 700, color: '#FFFFFF' }}>
+                {isFr ? 'Scannez le QR' : 'Scan the QR'}
+              </span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.7vw' }}>
+            <span style={{ color: 'rgba(255, 255, 255, 0.3)', fontSize: '1vw' }}>—</span>
+
+            {/* Step 2 */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6vw' }}>
               <span style={{
-                width: '2vw',
-                height: '2vw',
+                width: '1.8vw',
+                height: '1.8vw',
                 borderRadius: '50%',
-                background: 'rgba(255, 184, 0, 0.2)',
+                background: 'rgba(255, 184, 0, 0.25)',
                 color: '#FFB800',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontWeight: 800,
-                fontSize: '0.9vw',
-                flexShrink: 0,
+                fontSize: '0.85vw',
               }}>
                 2
               </span>
-              <div>
-                <strong style={{ display: 'block', fontSize: '0.9vw', color: '#FFFFFF' }}>
-                  {isFr ? 'Validez en 1 clic' : '1-Click Pay'}
-                </strong>
-                <span style={{ fontSize: '0.72vw', color: 'rgba(255, 255, 255, 0.6)' }}>
-                  Apple Pay / CB
-                </span>
-              </div>
+              <span style={{ fontSize: '1vw', fontWeight: 700, color: '#FFFFFF' }}>
+                {isFr ? 'Payez en 1 clic' : '1-Click Pay'}
+              </span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.7vw' }}>
+            <span style={{ color: 'rgba(255, 255, 255, 0.3)', fontSize: '1vw' }}>—</span>
+
+            {/* Step 3 */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6vw' }}>
               <span style={{
-                width: '2vw',
-                height: '2vw',
+                width: '1.8vw',
+                height: '1.8vw',
                 borderRadius: '50%',
-                background: 'rgba(52, 211, 153, 0.2)',
+                background: 'rgba(52, 211, 153, 0.25)',
                 color: '#34D399',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontWeight: 800,
-                fontSize: '0.9vw',
-                flexShrink: 0,
+                fontSize: '0.85vw',
               }}>
                 3
               </span>
-              <div>
-                <strong style={{ display: 'block', fontSize: '0.9vw', color: '#34D399' }}>
-                  {isFr ? 'Emportez & Chargez' : 'Take & Charge'}
-                </strong>
-                <span style={{ fontSize: '0.72vw', color: 'rgba(255, 255, 255, 0.6)' }}>
-                  {isFr ? 'Éjection immédiate' : 'Automatic unlock'}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Pricing Highlight Pill */}
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '1.2vw',
-            background: 'linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            padding: '0.6vw 1.2vw',
-            borderRadius: '9999px',
-            width: 'fit-content',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.3vw' }}>
-              <span style={{ fontSize: '1.4vw', fontWeight: 800, color: '#FFB800' }}>2,49 €</span>
-              <span style={{ fontSize: '0.8vw', color: 'rgba(255, 255, 255, 0.8)', fontWeight: 600 }}>
-                {isFr ? '(1ère heure incluse)' : '(1st hour included)'}
+              <span style={{ fontSize: '1vw', fontWeight: 700, color: '#34D399' }}>
+                {isFr ? 'La batterie s\'éjecte' : 'Battery unlocks'}
               </span>
             </div>
-            <span style={{ color: 'rgba(255, 255, 255, 0.3)' }}>•</span>
-            <span style={{ fontSize: '0.8vw', color: 'rgba(255, 255, 255, 0.7)' }}>
-              {isFr ? '1,99 € / h suppl. • Plafond 24h bloqué à 12,99 €' : 'then €1.99 / hr • 24h Cap €12.99'}
+          </div>
+
+          {/* Pricing Headline Statement */}
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6vw' }}>
+            <span style={{
+              fontSize: '2vw',
+              fontWeight: 800,
+              color: '#FFB800',
+              letterSpacing: '-0.02em',
+            }}>
+              2,49 €
+            </span>
+            <span style={{ fontSize: '0.95vw', color: 'rgba(255, 255, 255, 0.85)', fontWeight: 600 }}>
+              {isFr ? '(1ère heure incluse)' : '(1st hour included)'}
+            </span>
+            <span style={{ color: 'rgba(255, 255, 255, 0.35)', margin: '0 0.3vw' }}>•</span>
+            <span style={{ fontSize: '0.95vw', color: 'rgba(255, 255, 255, 0.65)' }}>
+              {isFr ? 'puis 1,99 € / h • Sans abonnement' : 'then €1.99 / hr • No subscription'}
             </span>
           </div>
+
         </div>
 
-        {/* RIGHT COLUMN: The Magnetic QR Code Target Box */}
-        <div style={{
-          flex: 0.85,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'relative',
-        }}>
-          {/* Outer Ambient Glow Effect */}
-          <div style={{
-            background: '#FFFFFF',
-            padding: '1.6vw',
-            borderRadius: '2.4vw',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.6), 0 0 70px rgba(255, 184, 0, 0.28)',
+        {/* RIGHT COLUMN: The High-Contrast Floating QR Target with Laser Sweep */}
+        <div 
+          className="floating-element"
+          style={{
+            flex: 0.82,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '1vw',
+            justifyContent: 'center',
             position: 'relative',
+          }}
+        >
+          {/* Pure White Minimal Pedestal */}
+          <div style={{
+            background: '#FFFFFF',
+            padding: '1.8vw',
+            borderRadius: '2.4vw',
+            boxShadow: '0 25px 70px rgba(0, 0, 0, 0.65), 0 0 60px rgba(255, 184, 0, 0.3)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '1.1vw',
+            position: 'relative',
+            overflow: 'hidden',
           }}>
-            {/* Scannable Vector QR Code */}
+            
+            {/* The Active Laser Sweep Line */}
+            <div className="laser-line" />
+
+            {/* Crisp Vector QR Code */}
             <div style={{
               background: '#FFFFFF',
-              padding: '0.5vw',
-              borderRadius: '1.2vw',
+              borderRadius: '1vw',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              position: 'relative',
             }}>
               <QRCodeSVG 
                 value={rentalUrl} 
-                size={230}
+                size={240}
                 level="H"
                 fgColor="#240540"
               />
             </div>
 
-            {/* Instruction Callout */}
+            {/* Direct Call to Action */}
             <div style={{ textAlign: 'center' }}>
-              <div style={{
-                background: '#FAF5FF',
-                color: '#300E58',
-                padding: '0.4vw 1.2vw',
+              <span style={{
+                display: 'inline-block',
+                background: 'linear-gradient(135deg, #240540 0%, #3B0F6B 100%)',
+                color: '#FFFFFF',
+                padding: '0.45vw 1.3vw',
                 borderRadius: '9999px',
                 fontWeight: 800,
-                fontSize: '0.95vw',
+                fontSize: '0.9vw',
                 letterSpacing: '-0.01em',
-                display: 'inline-block',
-                marginBottom: '0.3vw',
+                boxShadow: '0 4px 15px rgba(36, 5, 64, 0.3)',
               }}>
                 {isFr ? '📱 Pointez votre appareil photo' : '📱 Point your phone camera'}
-              </div>
+              </span>
+
               <p style={{
                 fontSize: '0.75vw',
                 fontWeight: 600,
                 color: '#6B7280',
-                margin: 0,
+                marginTop: '0.4vw',
+                marginBottom: 0,
               }}>
                 Apple Pay • Google Pay • Carte Bancaire
               </p>
             </div>
+
           </div>
         </div>
       </div>
 
-      {/* FOOTER BAR: Cable Types + Consumer Guarantees */}
+      {/* 3. MINIMALIST FOOTER: Built-in Cables & Security Guarantees */}
       <footer style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-        paddingTop: '1vw',
+        borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+        paddingTop: '0.9vw',
         zIndex: 10,
-        fontSize: '0.8vw',
-        color: 'rgba(255, 255, 255, 0.7)',
+        fontSize: '0.85vw',
       }}>
-        {/* Built-in Cable Compatibility */}
+        {/* Built-in Cables Indicator */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8vw' }}>
-          <span style={{ fontWeight: 700, color: '#FFFFFF' }}>
-            {isFr ? 'Câbles intégrés sur chaque batterie :' : 'Integrated cables on every battery:'}
+          <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontWeight: 600 }}>
+            {isFr ? 'Câbles inclus sur chaque batterie :' : 'Cables included on each battery:'}
           </span>
-          <span style={{ background: 'rgba(255,255,255,0.1)', padding: '0.2vw 0.6vw', borderRadius: '6px', color: '#FFB800', fontWeight: 600 }}>Lightning (iPhone)</span>
-          <span style={{ background: 'rgba(255,255,255,0.1)', padding: '0.2vw 0.6vw', borderRadius: '6px', color: '#FFB800', fontWeight: 600 }}>USB Type-C</span>
-          <span style={{ background: 'rgba(255,255,255,0.1)', padding: '0.2vw 0.6vw', borderRadius: '6px', color: '#FFB800', fontWeight: 600 }}>Micro-USB</span>
+          <span style={{ color: '#FFB800', fontWeight: 700 }}>⚡ Lightning (iPhone)</span>
+          <span style={{ color: 'rgba(255, 255, 255, 0.3)' }}>•</span>
+          <span style={{ color: '#FFB800', fontWeight: 700 }}>⚡ USB Type-C</span>
+          <span style={{ color: 'rgba(255, 255, 255, 0.3)' }}>•</span>
+          <span style={{ color: '#FFB800', fontWeight: 700 }}>⚡ Micro-USB</span>
         </div>
 
-        {/* Consumer Trust points */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.2vw' }}>
+        {/* Trust Badges */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1vw', color: 'rgba(255, 255, 255, 0.65)' }}>
           <span>🔒 {isFr ? 'Paiement sécurisé par Stripe' : 'Secure Stripe Payment'}</span>
           <span>•</span>
-          <span>⚡ {isFr ? 'Batteries certifiées CE anti-surchauffe' : 'CE Certified Overheat Protection'}</span>
-          <span>•</span>
-          <span>✓ {isFr ? 'Caution débloquée immédiatement' : 'Instant Deposit Release'}</span>
+          <span>⚡ {isFr ? 'Protection anti-surchauffe certifiée' : 'Certified Overheat Protection'}</span>
         </div>
       </footer>
     </div>
@@ -419,7 +548,7 @@ function KioskDisplay() {
 
 export default function KioskAttractScreen() {
   return (
-    <Suspense fallback={<div style={{ width: '100vw', height: '100vh', background: '#1E0438', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF' }}>Chargement...</div>}>
+    <Suspense fallback={<div style={{ width: '100vw', height: '100vh', background: '#120224', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF' }}>Chargement...</div>}>
       <KioskDisplay />
     </Suspense>
   );
