@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/firebaseAdmin';
 import { dispenseBattery } from '@/lib/hardwareApi';
+import { FieldValue } from 'firebase-admin/firestore';
 
 export async function POST(request: Request) {
   try {
@@ -12,100 +13,89 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Ensure the kiosk has available batteries
-    const kiosk = await prisma.kiosk.findUnique({
-      where: { kiosk_id },
-      include: { batteries: { where: { status: 'AVAILABLE' } } },
-    });
-
-    if (!kiosk || kiosk.batteries.length === 0) {
-      return NextResponse.json({ error: 'No available batteries at this kiosk' }, { status: 400 });
-    }
-
-    // Assume user has a Stripe customer ID, if not, create one or handle it
-    const user = await prisma.user.findUnique({ where: { user_id } });
-    if (!user) {
+    // 1. Check user in Firestore
+    const userRef = db.collection('users').doc(user_id);
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-    
-    if (user.active_rental_status) {
+    const userData = userDoc.data();
+    if (userData?.active_rental_status) {
       return NextResponse.json({ error: 'User already has an active rental' }, { status: 400 });
     }
 
-    let stripeCustomerId = user.stripe_customer_id;
+    // 2. Check kiosk & available batteries
+    const batteriesSnap = await db.collection('batteries')
+      .where('current_kiosk_id', '==', kiosk_id)
+      .where('status', '==', 'AVAILABLE')
+      .limit(1)
+      .get();
+
+    if (batteriesSnap.empty) {
+      return NextResponse.json({ error: 'No available batteries at this kiosk' }, { status: 400 });
+    }
+    const batteryToDispense = batteriesSnap.docs[0];
+    const batteryId = batteryToDispense.id;
+
+    // 3. Handle Stripe Customer
+    let stripeCustomerId = userData?.stripe_customer_id;
     if (!stripeCustomerId) {
       const customer = await stripe.customers.create({ metadata: { user_id } });
       stripeCustomerId = customer.id;
-      await prisma.user.update({
-        where: { user_id },
-        data: { stripe_customer_id: stripeCustomerId },
-      });
+      await userRef.update({ stripe_customer_id: stripeCustomerId });
     }
 
-    // Create a Pre-Authorization hold of €24.99 (2499 cents)
+    // 4. Create Pre-Authorization hold of €24.99 (2499 cents)
     const paymentIntent = await stripe.paymentIntents.create({
       amount: 2499,
       currency: 'eur',
       customer: stripeCustomerId,
       payment_method: payment_method_id,
-      capture_method: 'manual', // This creates the hold
+      capture_method: 'manual', // Hold creation
       confirm: true,
-      return_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/return`, // required for some payment methods
+      return_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/return`,
     });
 
     if (paymentIntent.status === 'requires_capture') {
-      // Hold successful!
-      // Pick a battery to dispense
-      const batteryToDispense = kiosk.batteries[0];
+      // 5. Atomic Batch Write in Firestore
+      const batch = db.batch();
+      
+      const kioskRef = db.collection('kiosks').doc(kiosk_id);
+      const batteryRef = db.collection('batteries').doc(batteryId);
+      const txRef = db.collection('transactions').doc();
 
-      // Update Database
-      await prisma.$transaction([
-        prisma.battery.update({
-          where: { battery_id: batteryToDispense.battery_id },
-          data: { status: 'RENTED', current_kiosk_id: null },
-        }),
-        prisma.kiosk.update({
-          where: { kiosk_id },
-          data: { 
-            available_batteries: { decrement: 1 },
-            empty_slots: { increment: 1 } 
-          }
-        }),
-        prisma.user.update({
-          where: { user_id },
-          data: { active_rental_status: true }
-        }),
-        prisma.transaction.create({
-          data: {
-            user_id,
-            battery_id: batteryToDispense.battery_id,
-            pre_auth_id: paymentIntent.id,
-            status: 'PRE_AUTH_SUCCESS',
-          }
-        })
-      ]);
+      batch.update(batteryRef, { status: 'RENTED', current_kiosk_id: null });
+      batch.update(kioskRef, {
+        available_batteries: FieldValue.increment(-1),
+        empty_slots: FieldValue.increment(1),
+      });
+      batch.update(userRef, { active_rental_status: true });
+      batch.set(txRef, {
+        transaction_id: txRef.id,
+        user_id,
+        battery_id: batteryId,
+        pre_auth_id: paymentIntent.id,
+        start_time: new Date(),
+        status: 'PRE_AUTH_SUCCESS',
+      });
 
-      // Call physical hardware station to dispense battery
-      const hardwareResult = await dispenseBattery(
-        kiosk.kiosk_id,
-        batteryToDispense.battery_id,
-        1 // bayonet/slot index
-      );
+      await batch.commit();
 
-      return NextResponse.json({ 
-        success: true, 
+      // 6. Trigger physical ejection on hardware kiosk
+      const hardwareResult = await dispenseBattery(kiosk_id, batteryId, 1);
+
+      return NextResponse.json({
+        success: true,
         message: 'Pre-auth successful, dispensing battery',
-        battery_id: batteryToDispense.battery_id,
+        battery_id: batteryId,
         hardware_task: hardwareResult,
       });
     } else {
-      // requires_action or failed
-      return NextResponse.json({ 
-        error: 'Payment requires additional action or failed', 
-        status: paymentIntent.status 
+      return NextResponse.json({
+        error: 'Payment requires additional action or failed',
+        status: paymentIntent.status,
       }, { status: 400 });
     }
-
   } catch (error: any) {
     console.error('Pre-auth error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });

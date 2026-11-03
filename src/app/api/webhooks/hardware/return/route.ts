@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/firebaseAdmin';
+import { FieldValue } from 'firebase-admin/firestore';
 
 // Pricing rules
 const MAX_CAP_CENTS = 2499; // €24.99 (48 hours)
@@ -41,68 +42,67 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing hardware return parameters' }, { status: 400 });
     }
 
-    // 1. Find the active transaction for this battery
-    const transaction = await prisma.transaction.findFirst({
-      where: { 
-        battery_id,
-        status: 'PRE_AUTH_SUCCESS'
-      },
-      orderBy: { start_time: 'desc' }
-    });
+    // 1. Find active transaction for this battery
+    const txSnap = await db.collection('transactions')
+      .where('battery_id', '==', battery_id)
+      .where('status', '==', 'PRE_AUTH_SUCCESS')
+      .limit(1)
+      .get();
 
-    if (!transaction) {
+    if (txSnap.empty) {
       return NextResponse.json({ error: 'No active transaction found for this battery' }, { status: 404 });
     }
 
+    const txDoc = txSnap.docs[0];
+    const txData = txDoc.data();
+    const startTime = txData.start_time?.toDate ? txData.start_time.toDate() : new Date(txData.start_time);
     const endTime = new Date();
-    const chargeAmountCents = calculateChargeAmount(transaction.start_time, endTime);
+    const chargeAmountCents = calculateChargeAmount(startTime, endTime);
 
-    // 2. Process Capture logic with Stripe
-    if (transaction.pre_auth_id) {
+    // 2. Capture final amount on Stripe & release rest of hold
+    if (txData.pre_auth_id) {
       try {
-        await stripe.paymentIntents.capture(transaction.pre_auth_id, {
+        await stripe.paymentIntents.capture(txData.pre_auth_id, {
           amount_to_capture: chargeAmountCents,
         });
       } catch (stripeError) {
         console.error('Stripe capture failed:', stripeError);
-        // Continue to update DB even if capture failed, or handle specific retry logic
       }
     }
 
-    // 3. Update Database
-    await prisma.$transaction([
-      prisma.transaction.update({
-        where: { transaction_id: transaction.transaction_id },
-        data: {
-          end_time: endTime,
-          final_charge_amount: chargeAmountCents / 100, // store as EUR
-          status: 'COMPLETED'
-        }
-      }),
-      prisma.user.update({
-        where: { user_id: transaction.user_id },
-        data: { active_rental_status: false }
-      }),
-      prisma.battery.update({
-        where: { battery_id },
-        data: { 
-          status: 'AVAILABLE',
-          current_kiosk_id: kiosk_id
-        }
-      }),
-      prisma.kiosk.update({
-        where: { kiosk_id },
-        data: {
-          available_batteries: { increment: 1 },
-          empty_slots: { decrement: 1 }
-        }
-      })
-    ]);
+    // 3. Atomic Batch Update in Firestore
+    const batch = db.batch();
+    const txRef = txDoc.ref;
+    const userRef = db.collection('users').doc(txData.user_id);
+    const batteryRef = db.collection('batteries').doc(battery_id);
+    const kioskRef = db.collection('kiosks').doc(kiosk_id);
+
+    batch.update(txRef, {
+      end_time: endTime,
+      final_charge_amount: chargeAmountCents / 100, // store in EUR
+      status: 'COMPLETED',
+    });
+
+    batch.update(userRef, {
+      active_rental_status: false,
+    });
+
+    batch.update(batteryRef, {
+      status: 'AVAILABLE',
+      current_kiosk_id: kiosk_id,
+    });
+
+    batch.update(kioskRef, {
+      available_batteries: FieldValue.increment(1),
+      empty_slots: FieldValue.increment(-1),
+    });
+
+    await batch.commit();
 
     return NextResponse.json({ 
       success: true, 
       charge_amount_eur: chargeAmountCents / 100,
-      elapsed_time_minutes: Math.round((endTime.getTime() - transaction.start_time.getTime()) / 60000)
+      elapsed_time_minutes: Math.round((endTime.getTime() - startTime.getTime()) / 60000),
     });
 
   } catch (error: any) {

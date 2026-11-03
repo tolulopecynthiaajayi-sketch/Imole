@@ -25,6 +25,8 @@
 *.pem
 *.db
 *.db-journal
+*serviceAccount*.json
+serviceAccountKey.json
 .agents/
 .claude/
 .cursor/
