@@ -2,13 +2,14 @@
 
 import { useI18n } from '@/components/I18nProvider';
 import { useTheme } from '@/components/ThemeProvider';
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import ImoleLogo from '@/components/ImoleLogo';
 import LanguageToggle from '@/components/LanguageToggle';
 import ThemeToggle from '@/components/ThemeToggle';
 import BottomNav from '@/components/BottomNav';
 import { findStationByQrOrSn } from '@/lib/stationsConfig';
+import { getStoredRental, ActiveRentalSession } from '@/lib/rentalSession';
 
 function LandingPageContent() {
   const { lang } = useI18n();
@@ -18,6 +19,15 @@ function LandingPageContent() {
   const rawKiosk = searchParams.get('station') || searchParams.get('kiosk') || 'H00000147A';
   const isFr = lang === 'fr';
   const isDark = theme === 'dark';
+
+  const [activeRental, setActiveRental] = useState<ActiveRentalSession | null>(null);
+
+  useEffect(() => {
+    const stored = getStoredRental();
+    if (stored) {
+      setActiveRental(stored);
+    }
+  }, []);
 
   const stationData = findStationByQrOrSn(rawKiosk);
   const stationName = stationData 
@@ -103,7 +113,7 @@ function LandingPageContent() {
           gap: '8px',
           fontSize: '0.82rem',
           color: textSecondary,
-          marginBottom: '2rem',
+          marginBottom: activeRental ? '1.25rem' : '2rem',
         }}>
           <span style={{
             width: '8px',
@@ -119,6 +129,68 @@ function LandingPageContent() {
             {isFr ? 'Prête' : 'Ready'}
           </span>
         </div>
+
+        {/* Active Rental Detected Alert (If user returns with active rental) */}
+        {activeRental && (
+          <div style={{
+            background: isDark ? 'rgba(255, 184, 0, 0.08)' : 'rgba(180, 83, 9, 0.05)',
+            border: `1.5px solid ${accentGold}`,
+            borderRadius: '16px',
+            padding: '1.1rem 1.15rem',
+            marginBottom: '2rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.65rem',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{
+                  width: '9px',
+                  height: '9px',
+                  borderRadius: '50%',
+                  backgroundColor: '#10B981',
+                  boxShadow: '0 0 10px #10B981',
+                  display: 'inline-block',
+                }} />
+                <span style={{ fontWeight: 700, fontSize: '0.88rem', color: textPrimary }}>
+                  {isFr ? 'Location active détectée' : 'Active Rental Detected'}
+                </span>
+              </div>
+              <span style={{ fontSize: '0.78rem', color: accentGold, fontWeight: 700, fontFamily: 'monospace' }}>
+                {activeRental.batteryId}
+              </span>
+            </div>
+
+            <p style={{ margin: 0, fontSize: '0.82rem', color: textSecondary, lineHeight: 1.45 }}>
+              {isFr
+                ? 'Une batterie est déjà en cours d\'utilisation sur cet appareil. Pour la rendre, insérez-la simplement dans un emplacement libre avec voyant vert.'
+                : 'A power bank is currently active on this device. To return it, simply insert it into any free slot with a green LED.'}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => router.push(`/active?station=${rawKiosk}`)}
+              style={{
+                marginTop: '0.35rem',
+                backgroundColor: accentGold,
+                color: isDark ? '#120224' : '#FFFFFF',
+                border: 'none',
+                borderRadius: '10px',
+                padding: '0.65rem 1rem',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                cursor: 'pointer',
+              }}
+            >
+              <span>{isFr ? 'Voir ma location active & le temps' : 'View active rental & timer'}</span>
+              <span>→</span>
+            </button>
+          </div>
+        )}
 
         {/* Hero Section (Open, breathable typography, zero stacked boxes) */}
         <div style={{ marginBottom: '2.5rem' }}>

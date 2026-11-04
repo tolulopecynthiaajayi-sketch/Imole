@@ -8,27 +8,49 @@ import ImoleLogo from '@/components/ImoleLogo';
 import LanguageToggle from '@/components/LanguageToggle';
 import ThemeToggle from '@/components/ThemeToggle';
 import BottomNav from '@/components/BottomNav';
+import { getStoredRental, saveStoredRental, completeStoredRental } from '@/lib/rentalSession';
 
 function ActiveRentalContent() {
   const { lang, t } = useI18n();
   const { theme } = useTheme();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const kioskId = searchParams.get('station') || searchParams.get('kiosk');
+  const sessionId = searchParams.get('session_id') || searchParams.get('session');
+  const urlBattery = searchParams.get('battery') || searchParams.get('battery_id');
+  const kioskId = searchParams.get('station') || searchParams.get('kiosk') || 'H00000147A';
   const isFr = lang === 'fr';
   const isDark = theme === 'dark';
   
-  const [elapsedMs, setElapsedMs] = useState(120000); // Start at 2 mins for immediate visual satisfaction
-  const [batteryId] = useState('BAT-F20002DD6A');
+  const [elapsedMs, setElapsedMs] = useState(120000);
+  const [batteryId, setBatteryId] = useState('BAT-F20002DD6A');
 
   useEffect(() => {
-    const start = Date.now() - 120000;
+    let rental = getStoredRental();
+    const now = Date.now();
+
+    if (!rental) {
+      // First time landing or after checkout redirect
+      const start = now - 120000; // 2 mins elapsed initial offset for live preview
+      rental = {
+        rentalId: sessionId || `rent_${now}`,
+        batteryId: urlBattery || 'BAT-F20002DD6A',
+        startTime: start,
+        kioskId: kioskId,
+        status: 'ACTIVE',
+      };
+      saveStoredRental(rental);
+    }
+
+    setBatteryId(rental.batteryId);
+    const startTimestamp = rental.startTime;
+    setElapsedMs(Math.max(0, now - startTimestamp));
+
     const interval = setInterval(() => {
-      setElapsedMs(Date.now() - start);
+      setElapsedMs(Math.max(0, Date.now() - startTimestamp));
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [sessionId, urlBattery, kioskId]);
 
   const formatTime = (ms: number) => {
     const totalSeconds = Math.floor(ms / 1000);
@@ -52,7 +74,10 @@ function ActiveRentalContent() {
   };
 
   const handleSimulateReturn = () => {
-    router.push(`/receipt?duration=${Math.max(1, Math.round(elapsedMs / 60000))}&cost=${calculateCost(elapsedMs)}${kioskId ? `&kiosk=${kioskId}` : ''}`);
+    const durationMinutes = Math.max(1, Math.round(elapsedMs / 60000));
+    const cost = calculateCost(elapsedMs);
+    completeStoredRental({ durationMinutes, cost, kioskId });
+    router.push(`/receipt?duration=${durationMinutes}&cost=${cost}${kioskId ? `&kiosk=${kioskId}` : ''}`);
   };
 
   // Color tokens
