@@ -84,7 +84,7 @@ function StationsContent() {
           <span>{isFr ? 'Accueil' : 'Home'}</span>
         </button>
 
-        <ImoleLogo size="sm" />
+        <ImoleLogo size="sm" light={true} />
         <LanguageToggle variant="dark" />
       </header>
 
@@ -413,3 +413,4 @@ export default function StationsPage() {
     </Suspense>
   );
 }
+

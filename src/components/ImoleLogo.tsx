@@ -5,7 +5,7 @@ interface ImoleLogoProps {
   light?: boolean;
 }
 
-export default function ImoleLogo({ size = 'md', light = false }: ImoleLogoProps) {
+export default function ImoleLogo({ size = 'md', light = true }: ImoleLogoProps) {
   const fontSizes = {
     sm: { text: '1.25rem', halo: '8px', haloTop: '-6px' },
     md: { text: '1.75rem', halo: '10px', haloTop: '-8px' },
@@ -14,7 +14,7 @@ export default function ImoleLogo({ size = 'md', light = false }: ImoleLogoProps
   };
 
   const current = fontSizes[size];
-  const textColor = light ? '#FFFFFF' : '#300E58';
+  const textColor = light ? '#FFFFFF' : '#120224';
 
   return (
     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', userSelect: 'none' }}>
@@ -28,6 +28,7 @@ export default function ImoleLogo({ size = 'md', light = false }: ImoleLogoProps
             fontSize: current.text,
             color: textColor,
             fontFamily: 'system-ui, -apple-system, sans-serif',
+            textShadow: light ? '0 2px 12px rgba(0, 0, 0, 0.4)' : 'none',
           }}
         >
           IM

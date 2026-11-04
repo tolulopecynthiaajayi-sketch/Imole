@@ -92,3 +92,4 @@ export function findStationByQrOrSn(identifier: string): StationLocation | undef
     s => s.id.toUpperCase() === clean || s.deviceSn.toUpperCase() === clean
   );
 }
+

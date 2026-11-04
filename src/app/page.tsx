@@ -9,7 +9,7 @@ import BottomNav from '@/components/BottomNav';
 import { findStationByQrOrSn } from '@/lib/stationsConfig';
 
 function LandingPageContent() {
-  const { lang, t } = useI18n();
+  const { lang } = useI18n();
   const router = useRouter();
   const searchParams = useSearchParams();
   const rawKiosk = searchParams.get('station') || searchParams.get('kiosk') || 'H00000147A';
@@ -53,19 +53,19 @@ function LandingPageContent() {
 
   return (
     <div style={{
-      maxWidth: '460px',
+      maxWidth: '440px',
       margin: '0 auto',
       minHeight: '100vh',
       backgroundColor: '#120224',
       backgroundImage: `
-        radial-gradient(circle at 10% 12%, rgba(255, 184, 0, 0.14) 0%, transparent 40%),
-        radial-gradient(circle at 85% 75%, rgba(139, 92, 246, 0.2) 0%, transparent 50%),
-        linear-gradient(180deg, #120224 0%, #1A0430 100%)
+        radial-gradient(circle at 15% 10%, rgba(255, 184, 0, 0.15) 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(139, 92, 246, 0.18) 0%, transparent 50%),
+        linear-gradient(180deg, #120224 0%, #17032E 100%)
       `,
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
-      padding: '1.25rem 1.25rem 6.5rem 1.25rem',
+      padding: '1.5rem 1.5rem 6.5rem 1.5rem',
       fontFamily: "'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif",
       color: '#FFFFFF',
       position: 'relative',
@@ -76,291 +76,166 @@ function LandingPageContent() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: '1.25rem',
+          marginBottom: '2rem',
         }}>
-          <ImoleLogo size="md" />
+          <ImoleLogo size="md" light={true} />
           <LanguageToggle variant="dark" />
         </header>
 
-        {/* Live Station Beacon Pill */}
+        {/* Discreet Live Station Indicator (No heavy bordered box) */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          background: 'rgba(255, 255, 255, 0.06)',
-          backdropFilter: 'blur(16px)',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
-          borderRadius: '9999px',
-          padding: '7px 16px',
-          marginBottom: '1.15rem',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+          gap: '8px',
+          fontSize: '0.82rem',
+          color: 'rgba(255, 255, 255, 0.85)',
+          marginBottom: '1.75rem',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 600 }}>
-            <span style={{
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              backgroundColor: '#10B981',
-              boxShadow: '0 0 10px #10B981',
-              display: 'inline-block',
-            }} />
-            <span style={{ letterSpacing: '-0.01em' }}>{stationName}</span>
-          </div>
           <span style={{
-            fontSize: '0.72rem',
-            color: '#34D399',
-            fontWeight: 800,
-            textTransform: 'uppercase',
-            letterSpacing: '0.04em',
-          }}>
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            backgroundColor: '#10B981',
+            boxShadow: '0 0 10px #10B981',
+            display: 'inline-block',
+          }} />
+          <span style={{ fontWeight: 600 }}>{stationName}</span>
+          <span style={{ color: 'rgba(255, 255, 255, 0.3)' }}>•</span>
+          <span style={{ color: '#34D399', fontWeight: 700, fontSize: '0.78rem' }}>
             {isFr ? 'Prête' : 'Ready'}
           </span>
         </div>
 
-        {/* Hero Visual Card: The Luxury Power Bank Showcase */}
-        <div style={{
-          background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(48, 14, 88, 0.4) 100%)',
-          backdropFilter: 'blur(20px)',
-          borderRadius: '24px',
-          padding: '1.4rem',
-          border: '1px solid rgba(255, 184, 0, 0.25)',
-          boxShadow: '0 16px 48px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 184, 0, 0.08)',
-          position: 'relative',
-          overflow: 'hidden',
-          marginBottom: '1.15rem',
-        }}>
-          {/* Subtle Ambient Radial Orb */}
-          <div style={{
-            position: 'absolute',
-            top: '-20%',
-            right: '-10%',
-            width: '160px',
-            height: '160px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(255, 184, 0, 0.35) 0%, transparent 70%)',
-            pointerEvents: 'none',
-          }} />
+        {/* Breathable, Elegant Hero Section (Open typography, NO card box!) */}
+        <div style={{ marginBottom: '2.5rem' }}>
+          <h1 style={{
+            fontSize: '2.25rem',
+            fontWeight: 800,
+            lineHeight: 1.15,
+            letterSpacing: '-0.02em',
+            margin: '0 0 0.85rem 0',
+            color: '#FFFFFF',
+          }}>
+            {isFr ? 'Rechargez en toute liberté.' : 'Power up on the go.'}
+          </h1>
 
-          {/* Top Row: Battery Specs Tag */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+          <p style={{
+            fontSize: '0.95rem',
+            color: 'rgba(255, 255, 255, 0.75)',
+            lineHeight: 1.5,
+            margin: '0 0 1.25rem 0',
+          }}>
+            {isFr
+              ? 'Batterie universelle 6000 mAh avec 3 câbles rapides intégrés :'
+              : 'Universal 6000 mAh power bank with 3 built-in fast cables:'}
+          </p>
+
+          {/* Minimalist, Elegant Cable Line (No heavy badges) */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            flexWrap: 'wrap',
+            fontSize: '0.82rem',
+            fontWeight: 700,
+            color: '#FFD700',
+          }}>
+            <span>⚡ Lightning (iPhone)</span>
+            <span style={{ color: 'rgba(255, 255, 255, 0.25)' }}>•</span>
+            <span>⚡ USB-C</span>
+            <span style={{ color: 'rgba(255, 255, 255, 0.25)' }}>•</span>
+            <span>⚡ Micro-USB</span>
+          </div>
+        </div>
+
+        {/* Single Pricing Section (Spacious, transparent, NO 5 nested boxes!) */}
+        <div style={{
+          padding: '1.5rem 0',
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          marginBottom: '2rem',
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: '10px',
+            marginBottom: '0.4rem',
+          }}>
             <span style={{
+              fontSize: '2.5rem',
+              fontWeight: 800,
+              color: '#FFB800',
+              letterSpacing: '-0.03em',
+              lineHeight: 1,
+            }}>
+              2,49 €
+            </span>
+            <span style={{
+              fontSize: '1rem',
+              color: 'rgba(255, 255, 255, 0.75)',
+              fontWeight: 600,
+            }}>
+              {isFr ? 'pour la 1ère heure' : 'for the 1st hour'}
+            </span>
+          </div>
+
+          <div style={{
+            fontSize: '0.85rem',
+            color: 'rgba(255, 255, 255, 0.65)',
+            lineHeight: 1.4,
+            marginBottom: '0.75rem',
+          }}>
+            {isFr ? 'puis 1,99 € / h • Plafond 24h bloqué à 14,99 €' : 'then €1.99 / hr • 24h cap strictly at €14.99'}
+          </div>
+
+          <div style={{
+            fontSize: '0.75rem',
+            color: 'rgba(255, 255, 255, 0.45)',
+            lineHeight: 1.4,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+          }}>
+            <span>🛡️</span>
+            <span>
+              {isFr
+                ? 'Empreinte de caution : 24,99 € (non débitée, ajustée à la restitution).'
+                : 'Security hold: €24.99 (not charged, adjusted upon return).'}
+            </span>
+          </div>
+        </div>
+
+        {/* Understated, chic Station & Return link (No big heavy box) */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <button
+            type="button"
+            onClick={() => router.push(`/stations?station=${rawKiosk}`)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              color: '#FFB800',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              background: 'rgba(255, 184, 0, 0.16)',
-              border: '1px solid rgba(255, 184, 0, 0.4)',
-              color: '#FFB800',
-              padding: '4px 12px',
-              borderRadius: '9999px',
-              fontSize: '0.78rem',
-              fontWeight: 800,
-              letterSpacing: '0.04em',
-            }}>
-              ⚡ 6000 mAh
+              transition: 'opacity 0.15s ease',
+            }}
+          >
+            <span>🗺️</span>
+            <span style={{ textDecoration: 'underline', textUnderlineOffset: '3px' }}>
+              {isFr ? 'Voir toutes les bornes à Lille & guide de retour' : 'View all stations in Lille & return guide'}
             </span>
-            <span style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.75)', fontWeight: 600 }}>
-              {isFr ? 'Charge Ultra-Rapide' : 'Ultra-Fast Charge'}
-            </span>
-          </div>
-
-          {/* Hero Headline */}
-          <h1 style={{ fontSize: '1.55rem', fontWeight: 800, lineHeight: 1.22, margin: '0 0 0.35rem 0', color: '#FFFFFF' }}>
-            {isFr ? 'Rechargez immédiatement' : 'Instant Power On The Go'}
-          </h1>
-          <p style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.75)', margin: '0 0 1rem 0', lineHeight: 1.4 }}>
-            {isFr 
-              ? 'Aucun câble à prévoir : 3 connecteurs sont intégrés à la batterie.'
-              : 'No cable needed: 3 fast-charge cables are built directly in.'}
-          </p>
-
-          {/* 3 Built-in Cable Badges */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-            <span style={{
-              background: 'rgba(255, 255, 255, 0.1)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              padding: '6px 12px',
-              borderRadius: '12px',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              color: '#FFD700',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px',
-            }}>
-              ⚡ Lightning (iPhone)
-            </span>
-            <span style={{
-              background: 'rgba(255, 255, 255, 0.1)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              padding: '6px 12px',
-              borderRadius: '12px',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              color: '#FFD700',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px',
-            }}>
-              ⚡ USB-C (Android / Mac)
-            </span>
-            <span style={{
-              background: 'rgba(255, 255, 255, 0.1)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              padding: '6px 12px',
-              borderRadius: '12px',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              color: '#FFD700',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px',
-            }}>
-              ⚡ Micro-USB
-            </span>
-          </div>
+            <span>→</span>
+          </button>
         </div>
-
-        {/* Pricing Card: Unified luxury dark glass, 14,99 cap */}
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(20px)',
-          borderRadius: '20px',
-          padding: '1.25rem',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
-          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.35)',
-          marginBottom: '1.15rem',
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.08em', color: 'rgba(255, 255, 255, 0.65)', textTransform: 'uppercase' }}>
-              {isFr ? 'Tarification' : 'Pricing'}
-            </span>
-            <span style={{ fontSize: '0.75rem', color: '#34D399', fontWeight: 700 }}>
-              {isFr ? 'Plafond 24h garanti' : 'Guaranteed 24h Cap'}
-            </span>
-          </div>
-
-          {/* 3 Fluid Tiers */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-            <div style={{
-              background: 'rgba(255, 184, 0, 0.12)',
-              border: '1.5px solid rgba(255, 184, 0, 0.35)',
-              padding: '10px 6px',
-              borderRadius: '14px',
-              textAlign: 'center',
-            }}>
-              <strong style={{ display: 'block', fontSize: '1.2rem', color: '#FFB800', fontWeight: 800 }}>
-                2,49 €
-              </strong>
-              <span style={{ fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.75)', lineHeight: 1.2 }}>
-                {isFr ? '1ère heure' : '1st hour'}
-              </span>
-            </div>
-
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              padding: '10px 6px',
-              borderRadius: '14px',
-              textAlign: 'center',
-            }}>
-              <strong style={{ display: 'block', fontSize: '1.2rem', color: '#FFFFFF', fontWeight: 800 }}>
-                1,99 €
-              </strong>
-              <span style={{ fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.75)', lineHeight: 1.2 }}>
-                {isFr ? '/ h suppl.' : '/ add. hr'}
-              </span>
-            </div>
-
-            <div style={{
-              background: 'rgba(255, 184, 0, 0.12)',
-              border: '1.5px solid rgba(255, 184, 0, 0.35)',
-              padding: '10px 6px',
-              borderRadius: '14px',
-              textAlign: 'center',
-            }}>
-              <strong style={{ display: 'block', fontSize: '1.2rem', color: '#FFB800', fontWeight: 800 }}>
-                14,99 €
-              </strong>
-              <span style={{ fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.75)', lineHeight: 1.2 }}>
-                {isFr ? 'Plafond 24h' : '24h Max Cap'}
-              </span>
-            </div>
-          </div>
-
-          {/* Deposit Guarantee Note */}
-          <div style={{
-            marginTop: '0.85rem',
-            padding: '8px 12px',
-            borderRadius: '12px',
-            background: 'rgba(255, 255, 255, 0.04)',
-            fontSize: '0.75rem',
-            color: 'rgba(255, 255, 255, 0.75)',
-            lineHeight: 1.4,
-            display: 'flex',
-            gap: '8px',
-            alignItems: 'center',
-          }}>
-            <span style={{ fontSize: '1.1rem' }}>🛡️</span>
-            <span>
-              {isFr 
-                ? 'Empreinte de caution : 24,99 € temporairement réservée, ajustée à la restitution.'
-                : 'Security hold: €24.99 temporarily held, released automatically when returned.'}
-            </span>
-          </div>
-        </div>
-
-        {/* Station Finder & Return Card Trigger */}
-        <button
-          type="button"
-          onClick={() => router.push(`/stations?station=${rawKiosk}`)}
-          style={{
-            width: '100%',
-            background: 'rgba(255, 255, 255, 0.05)',
-            backdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            borderRadius: '18px',
-            padding: '12px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            cursor: 'pointer',
-            textAlign: 'left',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
-            transition: 'all 0.2s ease',
-            marginBottom: '1rem',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '12px',
-              background: 'rgba(255, 184, 0, 0.15)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.2rem',
-              color: '#FFB800',
-              flexShrink: 0,
-            }}>
-              🗺️
-            </span>
-            <div>
-              <strong style={{ display: 'block', fontSize: '0.85rem', color: '#FFFFFF' }}>
-                {isFr ? 'Bornes IMỌLẸ à Lille & Restitution' : 'IMỌLẸ Stations in Lille & Returns'}
-              </strong>
-              <span style={{ fontSize: '0.72rem', color: '#FFB800', fontWeight: 600 }}>
-                {isFr ? 'Voir la carte des bornes & places libres →' : 'View stations & free return slots →'}
-              </span>
-            </div>
-          </div>
-          <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '1rem' }}>›</span>
-        </button>
       </div>
 
-      {/* Bottom Sticky Action Area */}
+      {/* Bottom Action Area */}
       <div>
-        {/* Pay Now Button with Golden Ambient Sheen */}
+        {/* Pay Now Button with Golden Sheen */}
         <button
           onClick={handlePay}
           disabled={isLoading}
@@ -370,16 +245,16 @@ function LandingPageContent() {
             color: '#120224',
             border: 'none',
             borderRadius: '9999px',
-            padding: '1.15rem 1.5rem',
-            fontSize: '1.1rem',
+            padding: '1.2rem 1.5rem',
+            fontSize: '1.15rem',
             fontWeight: 800,
             cursor: isLoading ? 'not-allowed' : 'pointer',
-            boxShadow: '0 10px 30px rgba(255, 184, 0, 0.35), 0 0 20px rgba(255, 167, 81, 0.2)',
+            boxShadow: '0 12px 36px rgba(255, 184, 0, 0.35)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: '8px',
-            transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+            transition: 'all 0.2s ease',
           }}
         >
           {isLoading ? (
@@ -392,15 +267,15 @@ function LandingPageContent() {
           )}
         </button>
 
-        {/* Accepted Payment Micro Badges */}
+        {/* Accepted Payment Logos */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           gap: '10px',
-          marginTop: '0.75rem',
-          fontSize: '0.72rem',
-          color: 'rgba(255, 255, 255, 0.65)',
+          marginTop: '0.85rem',
+          fontSize: '0.75rem',
+          color: 'rgba(255, 255, 255, 0.55)',
           fontWeight: 600,
         }}>
           <span> Apple Pay</span>
@@ -411,7 +286,7 @@ function LandingPageContent() {
         </div>
 
         {/* Terms Agreement Checkbox */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '0.65rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '0.75rem' }}>
           <input
             type="checkbox"
             id="terms"
@@ -419,7 +294,7 @@ function LandingPageContent() {
             onChange={(e) => setAcceptedTerms(e.target.checked)}
             style={{ width: '15px', height: '15px', accentColor: '#FFB800', cursor: 'pointer' }}
           />
-          <label htmlFor="terms" style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.65)', cursor: 'pointer' }}>
+          <label htmlFor="terms" style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.55)', cursor: 'pointer' }}>
             {isFr 
               ? 'J\'accepte les CGU et l\'empreinte temporaire de 24,99 €.'
               : 'I accept the Terms and the €24.99 temporary security hold.'}

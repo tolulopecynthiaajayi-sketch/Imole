@@ -36,7 +36,7 @@ function ReceiptContent() {
     }}>
       {/* Brand Header */}
       <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-        <ImoleLogo size="md" />
+        <ImoleLogo size="md" light={true} />
         <LanguageToggle variant="dark" />
       </header>
 

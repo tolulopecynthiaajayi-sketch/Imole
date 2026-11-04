@@ -68,7 +68,7 @@ function ActiveRentalContent() {
     }}>
       {/* Brand Header */}
       <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
-        <ImoleLogo size="md" />
+        <ImoleLogo size="md" light={true} />
         <LanguageToggle variant="dark" />
       </header>
 
