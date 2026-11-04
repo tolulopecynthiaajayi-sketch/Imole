@@ -5,14 +5,21 @@ import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import ImoleLogo from '@/components/ImoleLogo';
 import LanguageToggle from '@/components/LanguageToggle';
+import BottomNav from '@/components/BottomNav';
+import { findStationByQrOrSn } from '@/lib/stationsConfig';
 
 function LandingPageContent() {
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const kioskId = searchParams.get('station') || searchParams.get('kiosk') || 'H00000147A';
+  const rawKiosk = searchParams.get('station') || searchParams.get('kiosk') || 'H00000147A';
   const isFr = lang === 'fr';
-  
+
+  const stationData = findStationByQrOrSn(rawKiosk);
+  const stationName = stationData 
+    ? (isFr ? stationData.name : stationData.nameEn)
+    : (isFr ? `Borne Lille #${rawKiosk}` : `Lille Station #${rawKiosk}`);
+
   const [acceptedTerms, setAcceptedTerms] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [showGuideModal, setShowGuideModal] = useState(false);
@@ -28,7 +35,7 @@ function LandingPageContent() {
       const res = await fetch('/api/checkout_sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kiosk_id: kioskId }),
+        body: JSON.stringify({ kiosk_id: rawKiosk }),
       });
       const data = await res.json();
       
@@ -36,25 +43,31 @@ function LandingPageContent() {
         window.location.href = data.url;
       } else {
         setTimeout(() => {
-          router.push(`/active?kiosk=${kioskId}`);
+          router.push(`/active?kiosk=${rawKiosk}`);
         }, 600);
       }
     } catch {
-      router.push(`/active?kiosk=${kioskId}`);
+      router.push(`/active?kiosk=${rawKiosk}`);
     }
   };
 
   return (
     <div style={{
-      maxWidth: '430px',
+      maxWidth: '460px',
       margin: '0 auto',
       minHeight: '100vh',
-      backgroundColor: '#FAF9FE',
+      backgroundColor: '#120224',
+      backgroundImage: `
+        radial-gradient(circle at 10% 12%, rgba(255, 184, 0, 0.14) 0%, transparent 40%),
+        radial-gradient(circle at 85% 75%, rgba(139, 92, 246, 0.2) 0%, transparent 50%),
+        linear-gradient(180deg, #120224 0%, #1A0430 100%)
+      `,
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
-      padding: '1.25rem 1.25rem 2rem 1.25rem',
+      padding: '1.25rem 1.25rem 6.5rem 1.25rem',
       fontFamily: "'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif",
+      color: '#FFFFFF',
       position: 'relative',
     }}>
       {/* Top Header */}
@@ -63,184 +76,231 @@ function LandingPageContent() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: '1rem',
+          marginBottom: '1.25rem',
         }}>
           <ImoleLogo size="md" />
-          <LanguageToggle variant="light" />
+          <LanguageToggle variant="dark" />
         </header>
 
-        {/* Station Location Pill */}
+        {/* Live Station Beacon Pill */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: '#FFFFFF',
-          border: '1px solid #ECEAF5',
+          background: 'rgba(255, 255, 255, 0.06)',
+          backdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
           borderRadius: '9999px',
-          padding: '6px 14px',
-          marginBottom: '1rem',
-          boxShadow: '0 2px 8px rgba(48, 14, 88, 0.03)',
+          padding: '7px 16px',
+          marginBottom: '1.15rem',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', color: '#374151', fontWeight: 600 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: '#FFFFFF', fontWeight: 600 }}>
             <span style={{
               width: '8px',
               height: '8px',
               borderRadius: '50%',
               backgroundColor: '#10B981',
-              boxShadow: '0 0 0 2px rgba(16, 185, 129, 0.25)',
+              boxShadow: '0 0 10px #10B981',
               display: 'inline-block',
             }} />
-            <span>{isFr ? `Borne #${kioskId}` : `Station #${kioskId}`}</span>
+            <span style={{ letterSpacing: '-0.01em' }}>{stationName}</span>
           </div>
-          <span style={{ fontSize: '0.72rem', color: '#059669', fontWeight: 700 }}>
-            {isFr ? 'Prête à l\'éjection' : 'Ready to eject'}
+          <span style={{
+            fontSize: '0.72rem',
+            color: '#34D399',
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.04em',
+          }}>
+            {isFr ? 'Prête' : 'Ready'}
           </span>
         </div>
 
         {/* Hero Visual Card: The Luxury Power Bank Showcase */}
         <div style={{
-          background: 'linear-gradient(145deg, #1A0430 0%, #350A5E 100%)',
+          background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(48, 14, 88, 0.4) 100%)',
+          backdropFilter: 'blur(20px)',
           borderRadius: '24px',
-          padding: '1.35rem',
-          color: '#FFFFFF',
-          boxShadow: '0 16px 40px rgba(36, 5, 64, 0.28)',
+          padding: '1.4rem',
+          border: '1px solid rgba(255, 184, 0, 0.25)',
+          boxShadow: '0 16px 48px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 184, 0, 0.08)',
           position: 'relative',
           overflow: 'hidden',
-          marginBottom: '1rem',
+          marginBottom: '1.15rem',
         }}>
-          {/* Subtle background ambient glow */}
+          {/* Subtle Ambient Radial Orb */}
           <div style={{
             position: 'absolute',
             top: '-20%',
             right: '-10%',
-            width: '180px',
-            height: '180px',
+            width: '160px',
+            height: '160px',
             borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(255, 184, 0, 0.28) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(255, 184, 0, 0.35) 0%, transparent 70%)',
+            pointerEvents: 'none',
           }} />
 
-          {/* Top Row: Specs */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
+          {/* Top Row: Battery Specs Tag */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
             <span style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              background: 'rgba(255, 184, 0, 0.15)',
-              border: '1px solid rgba(255, 184, 0, 0.35)',
+              background: 'rgba(255, 184, 0, 0.16)',
+              border: '1px solid rgba(255, 184, 0, 0.4)',
               color: '#FFB800',
-              padding: '4px 10px',
+              padding: '4px 12px',
               borderRadius: '9999px',
-              fontSize: '0.75rem',
+              fontSize: '0.78rem',
               fontWeight: 800,
               letterSpacing: '0.04em',
             }}>
               ⚡ 6000 mAh
             </span>
             <span style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.75)', fontWeight: 600 }}>
-              {isFr ? 'Charge Ultra-Rapide' : 'Fast Charge'}
+              {isFr ? 'Charge Ultra-Rapide' : 'Ultra-Fast Charge'}
             </span>
           </div>
 
-          {/* Headline */}
-          <h1 style={{ fontSize: '1.45rem', fontWeight: 800, lineHeight: 1.25, margin: '0 0 0.4rem 0' }}>
+          {/* Hero Headline */}
+          <h1 style={{ fontSize: '1.55rem', fontWeight: 800, lineHeight: 1.22, margin: '0 0 0.35rem 0', color: '#FFFFFF' }}>
             {isFr ? 'Rechargez immédiatement' : 'Instant Power On The Go'}
           </h1>
-          <p style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.8)', margin: '0 0 0.9rem 0', lineHeight: 1.35 }}>
+          <p style={{ fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.75)', margin: '0 0 1rem 0', lineHeight: 1.4 }}>
             {isFr 
-              ? '3 câbles haute vitesse directement intégrés dans la batterie :'
-              : '3 high-speed cables built directly into the battery:'}
+              ? 'Aucun câble à prévoir : 3 connecteurs sont intégrés à la batterie.'
+              : 'No cable needed: 3 fast-charge cables are built directly in.'}
           </p>
 
           {/* 3 Built-in Cable Badges */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
             <span style={{
               background: 'rgba(255, 255, 255, 0.1)',
-              backdropFilter: 'blur(10px)',
-              padding: '6px 10px',
-              borderRadius: '10px',
-              fontSize: '0.72rem',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              padding: '6px 12px',
+              borderRadius: '12px',
+              fontSize: '0.75rem',
               fontWeight: 700,
               color: '#FFD700',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
             }}>
               ⚡ Lightning (iPhone)
             </span>
             <span style={{
               background: 'rgba(255, 255, 255, 0.1)',
-              backdropFilter: 'blur(10px)',
-              padding: '6px 10px',
-              borderRadius: '10px',
-              fontSize: '0.72rem',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              padding: '6px 12px',
+              borderRadius: '12px',
+              fontSize: '0.75rem',
               fontWeight: 700,
               color: '#FFD700',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
             }}>
               ⚡ USB-C (Android / Mac)
             </span>
             <span style={{
               background: 'rgba(255, 255, 255, 0.1)',
-              backdropFilter: 'blur(10px)',
-              padding: '6px 10px',
-              borderRadius: '10px',
-              fontSize: '0.72rem',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              padding: '6px 12px',
+              borderRadius: '12px',
+              fontSize: '0.75rem',
               fontWeight: 700,
               color: '#FFD700',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
             }}>
               ⚡ Micro-USB
             </span>
           </div>
         </div>
 
-        {/* Pricing Card: Clear, decluttered, 14,99 cap */}
+        {/* Pricing Card: Unified luxury dark glass, 14,99 cap */}
         <div style={{
-          background: '#FFFFFF',
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(20px)',
           borderRadius: '20px',
-          padding: '1.15rem 1.25rem',
-          border: '1px solid #ECEAF5',
-          boxShadow: '0 4px 20px rgba(48, 14, 88, 0.05)',
-          marginBottom: '1rem',
+          padding: '1.25rem',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.35)',
+          marginBottom: '1.15rem',
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-            <span style={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.08em', color: '#6B7280', textTransform: 'uppercase' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.08em', color: 'rgba(255, 255, 255, 0.65)', textTransform: 'uppercase' }}>
               {isFr ? 'Tarification' : 'Pricing'}
             </span>
-            <span style={{ fontSize: '0.72rem', color: '#059669', fontWeight: 700 }}>
+            <span style={{ fontSize: '0.75rem', color: '#34D399', fontWeight: 700 }}>
               {isFr ? 'Plafond 24h garanti' : 'Guaranteed 24h Cap'}
             </span>
           </div>
 
+          {/* 3 Fluid Tiers */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-            <div style={{ background: '#FAF7FD', padding: '10px 6px', borderRadius: '12px', textAlign: 'center', border: '1.5px solid rgba(48, 14, 88, 0.2)' }}>
-              <strong style={{ display: 'block', fontSize: '1.15rem', color: '#300E58', fontWeight: 800 }}>2,49 €</strong>
-              <span style={{ fontSize: '0.68rem', color: '#6B7280', lineHeight: 1.2 }}>{isFr ? '1ère heure' : '1st hour'}</span>
+            <div style={{
+              background: 'rgba(255, 184, 0, 0.12)',
+              border: '1.5px solid rgba(255, 184, 0, 0.35)',
+              padding: '10px 6px',
+              borderRadius: '14px',
+              textAlign: 'center',
+            }}>
+              <strong style={{ display: 'block', fontSize: '1.2rem', color: '#FFB800', fontWeight: 800 }}>
+                2,49 €
+              </strong>
+              <span style={{ fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.75)', lineHeight: 1.2 }}>
+                {isFr ? '1ère heure' : '1st hour'}
+              </span>
             </div>
 
-            <div style={{ background: '#F9FAFB', padding: '10px 6px', borderRadius: '12px', textAlign: 'center', border: '1px solid #E5E7EB' }}>
-              <strong style={{ display: 'block', fontSize: '1.15rem', color: '#111827', fontWeight: 800 }}>1,99 €</strong>
-              <span style={{ fontSize: '0.68rem', color: '#6B7280', lineHeight: 1.2 }}>{isFr ? '/ h suppl.' : '/ add. hr'}</span>
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              padding: '10px 6px',
+              borderRadius: '14px',
+              textAlign: 'center',
+            }}>
+              <strong style={{ display: 'block', fontSize: '1.2rem', color: '#FFFFFF', fontWeight: 800 }}>
+                1,99 €
+              </strong>
+              <span style={{ fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.75)', lineHeight: 1.2 }}>
+                {isFr ? '/ h suppl.' : '/ add. hr'}
+              </span>
             </div>
 
-            <div style={{ background: '#FAF7FD', padding: '10px 6px', borderRadius: '12px', textAlign: 'center', border: '1px solid rgba(48, 14, 88, 0.15)' }}>
-              <strong style={{ display: 'block', fontSize: '1.15rem', color: '#300E58', fontWeight: 800 }}>14,99 €</strong>
-              <span style={{ fontSize: '0.68rem', color: '#6B7280', lineHeight: 1.2 }}>{isFr ? 'Plafond 24h' : '24h Max Cap'}</span>
+            <div style={{
+              background: 'rgba(255, 184, 0, 0.12)',
+              border: '1.5px solid rgba(255, 184, 0, 0.35)',
+              padding: '10px 6px',
+              borderRadius: '14px',
+              textAlign: 'center',
+            }}>
+              <strong style={{ display: 'block', fontSize: '1.2rem', color: '#FFB800', fontWeight: 800 }}>
+                14,99 €
+              </strong>
+              <span style={{ fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.75)', lineHeight: 1.2 }}>
+                {isFr ? 'Plafond 24h' : '24h Max Cap'}
+              </span>
             </div>
           </div>
 
-          {/* Deposit Guarantee */}
+          {/* Deposit Guarantee Note */}
           <div style={{
             marginTop: '0.85rem',
-            padding: '8px 10px',
-            borderRadius: '10px',
-            background: '#F9FAFB',
-            fontSize: '0.73rem',
-            color: '#4B5563',
-            lineHeight: 1.35,
+            padding: '8px 12px',
+            borderRadius: '12px',
+            background: 'rgba(255, 255, 255, 0.04)',
+            fontSize: '0.75rem',
+            color: 'rgba(255, 255, 255, 0.75)',
+            lineHeight: 1.4,
             display: 'flex',
             gap: '8px',
             alignItems: 'center',
           }}>
-            <span style={{ fontSize: '1rem' }}>🛡️</span>
+            <span style={{ fontSize: '1.1rem' }}>🛡️</span>
             <span>
               {isFr 
                 ? 'Empreinte de caution : 24,99 € temporairement réservée, ajustée à la restitution.'
@@ -249,76 +309,77 @@ function LandingPageContent() {
           </div>
         </div>
 
-        {/* Quick Link Card: Return & How It Works */}
+        {/* Station Finder & Return Card Trigger */}
         <button
           type="button"
-          onClick={() => setShowGuideModal(true)}
+          onClick={() => router.push(`/stations?station=${rawKiosk}`)}
           style={{
             width: '100%',
-            background: '#FFFFFF',
-            border: '1px solid #E5E7EB',
-            borderRadius: '16px',
-            padding: '10px 14px',
+            background: 'rgba(255, 255, 255, 0.05)',
+            backdropFilter: 'blur(16px)',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            borderRadius: '18px',
+            padding: '12px 16px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
             textAlign: 'left',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)',
-            transition: 'all 0.15s ease',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
+            transition: 'all 0.2s ease',
             marginBottom: '1rem',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '10px',
-              background: '#FAF7FD',
+              width: '36px',
+              height: '36px',
+              borderRadius: '12px',
+              background: 'rgba(255, 184, 0, 0.15)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '1.1rem',
-              color: '#300E58',
+              fontSize: '1.2rem',
+              color: '#FFB800',
               flexShrink: 0,
             }}>
-              📍
+              🗺️
             </span>
             <div>
-              <strong style={{ display: 'block', fontSize: '0.82rem', color: '#111827' }}>
-                {isFr ? 'Restitution dans n\'importe quelle borne' : 'Return to any partner station'}
+              <strong style={{ display: 'block', fontSize: '0.85rem', color: '#FFFFFF' }}>
+                {isFr ? 'Bornes IMỌLẸ à Lille & Restitution' : 'IMỌLẸ Stations in Lille & Returns'}
               </strong>
-              <span style={{ fontSize: '0.72rem', color: '#300E58', fontWeight: 600 }}>
-                {isFr ? 'Comment ça marche & guide de retour →' : 'How it works & return guide →'}
+              <span style={{ fontSize: '0.72rem', color: '#FFB800', fontWeight: 600 }}>
+                {isFr ? 'Voir la carte des bornes & places libres →' : 'View stations & free return slots →'}
               </span>
             </div>
           </div>
-          <span style={{ color: '#9CA3AF', fontSize: '0.85rem' }}>›</span>
+          <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '1rem' }}>›</span>
         </button>
       </div>
 
       {/* Bottom Sticky Action Area */}
       <div>
-        {/* Pay Now Button */}
+        {/* Pay Now Button with Golden Ambient Sheen */}
         <button
           onClick={handlePay}
           disabled={isLoading}
           style={{
             width: '100%',
-            background: 'linear-gradient(135deg, #1A0430 0%, #300E58 100%)',
-            color: '#FFFFFF',
+            background: 'linear-gradient(135deg, #FFA751 0%, #FFB800 100%)',
+            color: '#120224',
             border: 'none',
             borderRadius: '9999px',
-            padding: '1.1rem 1.5rem',
+            padding: '1.15rem 1.5rem',
             fontSize: '1.1rem',
             fontWeight: 800,
             cursor: isLoading ? 'not-allowed' : 'pointer',
-            boxShadow: '0 8px 24px rgba(48, 14, 88, 0.3)',
+            boxShadow: '0 10px 30px rgba(255, 184, 0, 0.35), 0 0 20px rgba(255, 167, 81, 0.2)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: '8px',
-            transition: 'all 0.2s ease',
+            transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
         >
           {isLoading ? (
@@ -331,7 +392,7 @@ function LandingPageContent() {
           )}
         </button>
 
-        {/* Accepted Payment Logos */}
+        {/* Accepted Payment Micro Badges */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -339,7 +400,7 @@ function LandingPageContent() {
           gap: '10px',
           marginTop: '0.75rem',
           fontSize: '0.72rem',
-          color: '#6B7280',
+          color: 'rgba(255, 255, 255, 0.65)',
           fontWeight: 600,
         }}>
           <span> Apple Pay</span>
@@ -349,16 +410,16 @@ function LandingPageContent() {
           <span>CB / Visa / Mastercard</span>
         </div>
 
-        {/* Terms Checkbox */}
+        {/* Terms Agreement Checkbox */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '0.65rem' }}>
           <input
             type="checkbox"
             id="terms"
             checked={acceptedTerms}
             onChange={(e) => setAcceptedTerms(e.target.checked)}
-            style={{ width: '15px', height: '15px', accentColor: '#300E58', cursor: 'pointer' }}
+            style={{ width: '15px', height: '15px', accentColor: '#FFB800', cursor: 'pointer' }}
           />
-          <label htmlFor="terms" style={{ fontSize: '0.72rem', color: '#6B7280', cursor: 'pointer' }}>
+          <label htmlFor="terms" style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.65)', cursor: 'pointer' }}>
             {isFr 
               ? 'J\'accepte les CGU et l\'empreinte temporaire de 24,99 €.'
               : 'I accept the Terms and the €24.99 temporary security hold.'}
@@ -366,165 +427,14 @@ function LandingPageContent() {
         </div>
       </div>
 
-      {/* Guide Bottom Sheet / Modal */}
-      {showGuideModal && (
-        <div 
-          onClick={() => setShowGuideModal(false)}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.55)',
-            backdropFilter: 'blur(4px)',
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'center',
-            zIndex: 1000,
-            animation: 'fadeIn 0.2s ease',
-          }}
-        >
-          <div 
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: '100%',
-              maxWidth: '460px',
-              backgroundColor: '#FFFFFF',
-              borderTopLeftRadius: '24px',
-              borderTopRightRadius: '24px',
-              padding: '1.5rem 1.25rem 2rem 1.25rem',
-              boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.25)',
-              maxHeight: '85vh',
-              overflowY: 'auto',
-            }}
-          >
-            {/* Modal Handle */}
-            <div style={{
-              width: '40px',
-              height: '4px',
-              borderRadius: '9999px',
-              backgroundColor: '#E5E7EB',
-              margin: '0 auto 1.25rem auto',
-            }} />
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#111827', margin: 0 }}>
-                {isFr ? 'Restitution & Utilisation' : 'Returns & How It Works'}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowGuideModal(false)}
-                style={{
-                  background: '#F3F4F6',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: '28px',
-                  height: '28px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  fontSize: '0.9rem',
-                  fontWeight: 700,
-                  color: '#6B7280',
-                }}
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Quick 3 Steps in Modal */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', marginBottom: '1.25rem' }}>
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                <span style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#FAF7FD', color: '#300E58', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '0.8rem' }}>1</span>
-                <div>
-                  <strong style={{ fontSize: '0.85rem', color: '#111827' }}>
-                    {isFr ? 'Éjection automatique' : 'Instant Automatic Ejection'}
-                  </strong>
-                  <p style={{ fontSize: '0.78rem', color: '#6B7280', margin: '2px 0 0 0', lineHeight: 1.35 }}>
-                    {isFr ? 'Après paiement, la borne clignote et libère la batterie immédiatement.' : 'After payment, the slot flashes and unlocks your battery instantly.'}
-                  </p>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                <span style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#FAF7FD', color: '#300E58', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '0.8rem' }}>2</span>
-                <div>
-                  <strong style={{ fontSize: '0.85rem', color: '#111827' }}>
-                    {isFr ? 'Chargez n\'importe où' : 'Charge anywhere'}
-                  </strong>
-                  <p style={{ fontSize: '0.78rem', color: '#6B7280', margin: '2px 0 0 0', lineHeight: 1.35 }}>
-                    {isFr ? '3 câbles intégrés (Lightning, USB-C, Micro-USB) et 6000 mAh de capacité.' : '3 built-in cables (Lightning, USB-C, Micro-USB) with 6000 mAh.'}
-                  </p>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', background: '#ECFDF5', padding: '10px', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
-                <span style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#10B981', color: '#FFFFFF', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '0.8rem' }}>✓</span>
-                <div>
-                  <strong style={{ fontSize: '0.85rem', color: '#065F46' }}>
-                    {isFr ? 'Restitution dans TOUTE borne du réseau' : 'Return to ANY station in the network'}
-                  </strong>
-                  <p style={{ fontSize: '0.78rem', color: '#047857', margin: '2px 0 0 0', lineHeight: 1.35 }}>
-                    {isFr 
-                      ? 'Insérez la batterie dans n\'importe quel emplacement libre d\'une borne IMỌLẸ jusqu\'au clic. La location s\'arrête et votre caution est débloquée.'
-                      : 'Push the battery into any empty slot on any IMỌLẸ station until it clicks. Rental ends and deposit is released.'}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Link to Full Page Guide */}
-            <button
-              type="button"
-              onClick={() => {
-                setShowGuideModal(false);
-                router.push(`/how-it-works?station=${kioskId}`);
-              }}
-              style={{
-                width: '100%',
-                background: '#FAF7FD',
-                border: '1.5px solid rgba(48, 14, 88, 0.2)',
-                borderRadius: '12px',
-                padding: '10px',
-                color: '#300E58',
-                fontWeight: 700,
-                fontSize: '0.85rem',
-                cursor: 'pointer',
-                marginBottom: '0.75rem',
-              }}
-            >
-              {isFr ? 'Consulter le guide complet & FAQ →' : 'Read full guide & FAQ →'}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowGuideModal(false)}
-              style={{
-                width: '100%',
-                background: '#300E58',
-                border: 'none',
-                borderRadius: '12px',
-                padding: '10px',
-                color: '#FFFFFF',
-                fontWeight: 700,
-                fontSize: '0.85rem',
-                cursor: 'pointer',
-              }}
-            >
-              {isFr ? 'Fermer' : 'Close'}
-            </button>
-          </div>
-        </div>
-      )}
+      <BottomNav activeTab="home" />
     </div>
   );
 }
 
 export default function LandingPage() {
   return (
-    <Suspense fallback={<div style={{ textAlign: 'center', padding: '3rem' }}>Chargement...</div>}>
+    <Suspense fallback={<div style={{ width: '100vw', height: '100vh', background: '#120224', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF' }}>Chargement...</div>}>
       <LandingPageContent />
     </Suspense>
   );

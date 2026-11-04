@@ -53,6 +53,15 @@ export type TranslationKey =
   | 'howItWorksStep4Title'
   | 'howItWorksStep4Desc'
   
+  // Stations Locator
+  | 'stationsNav'
+  | 'stationsTitle'
+  | 'stationsSubtitle'
+  | 'availableBatteriesLabel'
+  | 'emptySlotsLabel'
+  | 'getDirectionsBtn'
+  | 'findNearbyStations'
+  
   // Active Rental Screen
   | 'activeRentalTitle'
   | 'activeStatus'
@@ -121,7 +130,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     unlocking: "Paiement en cours...",
     howItWorksGuide: "Comment ça marche & retour ?",
     returnAnywhereTitle: "Restitution dans n'importe quelle borne",
-    returnAnywhereDesc: "Déposez votre batterie dans n'importe quelle borne IMỌLẸ dans Paris. Enclenchez-la dans un slot libre : la location s'arrête instantanément.",
+    returnAnywhereDesc: "Déposez votre batterie dans n'importe quelle borne IMỌLẸ à Lille. Enclenchez-la dans un slot libre : la location s'arrête instantanément.",
     howItWorksTitle: "Guide d'utilisation & restitution",
     howItWorksStep1Title: "1. Paiement en 1 clic",
     howItWorksStep1Desc: "Validez avec Apple Pay, Google Pay ou CB. La batterie s'éjecte automatiquement.",
@@ -131,6 +140,13 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     howItWorksStep3Desc: "Insérez la batterie dans n'importe quelle station IMỌLẸ jusqu'au clic audible. La location s'arrête automatiquement.",
     howItWorksStep4Title: "4. Tarification & Déblocage",
     howItWorksStep4Desc: "2,49 € pour la 1ère heure, puis 1,99 € / h. Plafond garanti bloqué à 14,99 € par tranche de 24h. L'empreinte de 24,99 € est automatiquement débloquée.",
+    stationsNav: "Stations",
+    stationsTitle: "Réseau de Bornes à Lille",
+    stationsSubtitle: "Trouvez une borne pour emprunter ou restituer une batterie",
+    availableBatteriesLabel: "Batteries prêtes",
+    emptySlotsLabel: "Places de retour",
+    getDirectionsBtn: "Y aller (Itinéraire)",
+    findNearbyStations: "Trouver une borne à Lille",
 
     // Active Screen
     activeRentalTitle: "Location en cours",
@@ -199,7 +215,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     unlocking: "Processing payment...",
     howItWorksGuide: "How it works & returns?",
     returnAnywhereTitle: "Return at any station",
-    returnAnywhereDesc: "Return your battery to any available IMỌLẸ station in Paris. Slide it into any empty slot: your rental ends immediately.",
+    returnAnywhereDesc: "Return your battery to any available IMỌLẸ station in Lille. Slide it into any empty slot: your rental ends immediately.",
     howItWorksTitle: "User & Return Guide",
     howItWorksStep1Title: "1. Tap to Pay",
     howItWorksStep1Desc: "Pay with Apple Pay, Google Pay, or Card in 1 tap. The battery pops out instantly.",
@@ -209,6 +225,13 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     howItWorksStep3Desc: "Slide the battery into any empty slot on any IMỌLẸ station until it clicks. Rental ends automatically.",
     howItWorksStep4Title: "4. Pricing & Hold Release",
     howItWorksStep4Desc: "€2.49 for the 1st hour, then €1.99 / hr. Guaranteed 24h cap at €14.99. The €24.99 hold is automatically released.",
+    stationsNav: "Stations",
+    stationsTitle: "Station Network in Lille",
+    stationsSubtitle: "Find an available station to rent or return a power bank",
+    availableBatteriesLabel: "Batteries ready",
+    emptySlotsLabel: "Return slots",
+    getDirectionsBtn: "Get Directions",
+    findNearbyStations: "Find a station in Lille",
 
     // Active Screen
     activeRentalTitle: "Active Rental",

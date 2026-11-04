@@ -23,19 +23,21 @@ export async function POST(request: Request) {
       userId = usersSnap.docs[0].id;
     }
 
-    // Ensure demo kiosk & battery exist
+    // Ensure Lille kiosks & batteries exist
     const kiosksSnap = await db.collection('kiosks').limit(1).get();
     if (kiosksSnap.empty) {
-      const kioskRef = await db.collection('kiosks').add({
-        location_name: "Station Paris Opéra",
+      await db.collection('kiosks').doc('H00000147A').set({
+        location_name: "IMỌLẸ - Grand Place Lille",
+        city: "Lille",
+        device_sn: "F0F5BD76AFC8",
         online_status: true,
-        available_batteries: 2,
-        empty_slots: 6,
+        available_batteries: 6,
+        empty_slots: 2,
         created_at: new Date(),
       });
-      await db.collection('batteries').doc('BAT-101').set({
-        battery_id: 'BAT-101',
-        current_kiosk_id: kioskRef.id,
+      await db.collection('batteries').doc('BAT-F20002DD6A').set({
+        battery_id: 'BAT-F20002DD6A',
+        current_kiosk_id: 'H00000147A',
         status: 'AVAILABLE',
       });
     }
