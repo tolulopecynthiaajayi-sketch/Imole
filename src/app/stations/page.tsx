@@ -17,10 +17,8 @@ function StationsContent() {
 
   const [filter, setFilter] = useState<'all' | 'returns' | 'open24'>('all');
   const [stations, setStations] = useState<StationLocation[]>(LILLE_STATIONS);
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Optionally fetch dynamic telemetry from /api/stations
     async function loadLiveStations() {
       try {
         const res = await fetch('/api/stations');
@@ -43,15 +41,16 @@ function StationsContent() {
 
   return (
     <div style={{
-      maxWidth: '460px',
+      maxWidth: '440px',
       margin: '0 auto',
       minHeight: '100vh',
       backgroundColor: '#120224',
       backgroundImage: `
-        radial-gradient(circle at 15% 15%, rgba(255, 184, 0, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 85% 85%, rgba(75, 0, 130, 0.25) 0%, transparent 50%)
+        radial-gradient(circle at 15% 12%, rgba(255, 184, 0, 0.15) 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(139, 92, 246, 0.18) 0%, transparent 50%),
+        linear-gradient(180deg, #120224 0%, #17032E 100%)
       `,
-      padding: '1.25rem 1.25rem 6.5rem 1.25rem',
+      padding: '1.5rem 1.5rem 6.5rem 1.5rem',
       fontFamily: "'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif",
       color: '#FFFFFF',
       position: 'relative',
@@ -61,23 +60,21 @@ function StationsContent() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: '1.25rem',
+        marginBottom: '2rem',
       }}>
         <button
           onClick={() => router.push(currentKiosk ? `/?station=${currentKiosk}` : '/')}
           style={{
-            background: 'rgba(255, 255, 255, 0.08)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            borderRadius: '9999px',
-            padding: '7px 14px',
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            fontSize: '0.82rem',
+            fontSize: '0.85rem',
             fontWeight: 700,
             color: '#FFB800',
             cursor: 'pointer',
-            backdropFilter: 'blur(10px)',
           }}
         >
           <span>←</span>
@@ -88,102 +85,102 @@ function StationsContent() {
         <LanguageToggle variant="dark" />
       </header>
 
-      {/* Hero Badge & Title */}
-      <div style={{ marginBottom: '1.25rem' }}>
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '6px',
-          padding: '4px 12px',
-          borderRadius: '9999px',
-          background: 'rgba(255, 184, 0, 0.12)',
-          border: '1px solid rgba(255, 184, 0, 0.3)',
-          color: '#FFB800',
-          fontSize: '0.75rem',
+      {/* Hero Header (Open, no box!) */}
+      <div style={{ marginBottom: '1.75rem' }}>
+        <h1 style={{
+          fontSize: '2rem',
           fontWeight: 800,
-          textTransform: 'uppercase',
-          letterSpacing: '0.06em',
-          marginBottom: '0.5rem',
+          lineHeight: 1.18,
+          letterSpacing: '-0.02em',
+          margin: '0 0 0.5rem 0',
+          color: '#FFFFFF',
         }}>
-          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10B981', display: 'inline-block' }} />
-          <span>{isFr ? 'Réseau Métropole Lilloise' : 'Lille Metro Network'}</span>
-        </div>
-
-        <h1 style={{ fontSize: '1.65rem', fontWeight: 800, lineHeight: 1.2, margin: '0 0 0.35rem 0', color: '#FFFFFF' }}>
-          {isFr ? 'Trouver une Borne à Lille' : 'Find a Station in Lille'}
+          {isFr ? 'Bornes à Lille' : 'Stations in Lille'}
         </h1>
-        <p style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.72)', margin: 0, lineHeight: 1.4 }}>
-          {isFr 
-            ? 'Empruntez et restituez votre batterie dans n\'importe quelle borne de notre réseau à Lille.'
-            : 'Borrow and return your battery at any IMỌLẸ station in Lille.'}
-        </p>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          fontSize: '0.85rem',
+          color: 'rgba(255, 255, 255, 0.72)',
+        }}>
+          <span style={{
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            backgroundColor: '#10B981',
+            boxShadow: '0 0 8px #10B981',
+            display: 'inline-block',
+          }} />
+          <span>{isFr ? '2 bornes actives • 11 batteries prêtes' : '2 active stations • 11 batteries ready'}</span>
+        </div>
       </div>
 
-      {/* Filter Tabs */}
+      {/* Filter Chips (Minimalist, no heavy borders) */}
       <div style={{
         display: 'flex',
-        gap: '6px',
-        marginBottom: '1.25rem',
+        gap: '8px',
+        marginBottom: '1.75rem',
         overflowX: 'auto',
-        paddingBottom: '4px',
+        paddingBottom: '2px',
       }}>
         <button
           onClick={() => setFilter('all')}
           style={{
             background: filter === 'all' ? '#FFB800' : 'rgba(255, 255, 255, 0.08)',
-            color: filter === 'all' ? '#120224' : 'rgba(255, 255, 255, 0.85)',
-            border: filter === 'all' ? 'none' : '1px solid rgba(255, 255, 255, 0.12)',
+            color: filter === 'all' ? '#120224' : 'rgba(255, 255, 255, 0.8)',
+            border: 'none',
             borderRadius: '9999px',
-            padding: '6px 14px',
-            fontSize: '0.78rem',
+            padding: '7px 16px',
+            fontSize: '0.8rem',
             fontWeight: 700,
             cursor: 'pointer',
             whiteSpace: 'nowrap',
             transition: 'all 0.15s ease',
           }}
         >
-          {isFr ? 'Toutes les bornes' : 'All Stations'}
+          {isFr ? 'Toutes' : 'All'}
         </button>
 
         <button
           onClick={() => setFilter('returns')}
           style={{
             background: filter === 'returns' ? '#FFB800' : 'rgba(255, 255, 255, 0.08)',
-            color: filter === 'returns' ? '#120224' : 'rgba(255, 255, 255, 0.85)',
-            border: filter === 'returns' ? 'none' : '1px solid rgba(255, 255, 255, 0.12)',
+            color: filter === 'returns' ? '#120224' : 'rgba(255, 255, 255, 0.8)',
+            border: 'none',
             borderRadius: '9999px',
-            padding: '6px 14px',
-            fontSize: '0.78rem',
+            padding: '7px 16px',
+            fontSize: '0.8rem',
             fontWeight: 700,
             cursor: 'pointer',
             whiteSpace: 'nowrap',
             transition: 'all 0.15s ease',
           }}
         >
-          {isFr ? 'Places de retour disponibles' : 'Return Slots Available'}
+          {isFr ? 'Places de retour' : 'Return Slots'}
         </button>
 
         <button
           onClick={() => setFilter('open24')}
           style={{
             background: filter === 'open24' ? '#FFB800' : 'rgba(255, 255, 255, 0.08)',
-            color: filter === 'open24' ? '#120224' : 'rgba(255, 255, 255, 0.85)',
-            border: filter === 'open24' ? 'none' : '1px solid rgba(255, 255, 255, 0.12)',
+            color: filter === 'open24' ? '#120224' : 'rgba(255, 255, 255, 0.8)',
+            border: 'none',
             borderRadius: '9999px',
-            padding: '6px 14px',
-            fontSize: '0.78rem',
+            padding: '7px 16px',
+            fontSize: '0.8rem',
             fontWeight: 700,
             cursor: 'pointer',
             whiteSpace: 'nowrap',
             transition: 'all 0.15s ease',
           }}
         >
-          {isFr ? 'Ouvert 24h/24' : 'Open 24/7'}
+          {isFr ? '24h/24' : '24/7'}
         </button>
       </div>
 
-      {/* Station Cards */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
+      {/* Station Cards (Single fluid card, NO nested boxes!) */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2rem' }}>
         {filteredStations.map((station) => {
           const isSelected = currentKiosk === station.id || currentKiosk === station.deviceSn;
 
@@ -192,11 +189,11 @@ function StationsContent() {
               key={station.id}
               style={{
                 background: isSelected 
-                  ? 'linear-gradient(145deg, rgba(255, 184, 0, 0.12) 0%, rgba(48, 14, 88, 0.5) 100%)' 
+                  ? 'linear-gradient(145deg, rgba(255, 184, 0, 0.12) 0%, rgba(48, 14, 88, 0.4) 100%)' 
                   : 'rgba(255, 255, 255, 0.05)',
-                backdropFilter: 'blur(16px)',
+                backdropFilter: 'blur(20px)',
                 borderRadius: '20px',
-                padding: '1.25rem',
+                padding: '1.35rem',
                 border: isSelected 
                   ? '1.5px solid #FFB800' 
                   : '1px solid rgba(255, 255, 255, 0.1)',
@@ -205,47 +202,27 @@ function StationsContent() {
                   : '0 8px 24px rgba(0, 0, 0, 0.3)',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '0.85rem',
-                transition: 'all 0.2s ease',
+                gap: '0.75rem',
               }}
             >
-              {/* Station Header */}
+              {/* Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <h3 style={{ fontSize: '1.05rem', fontWeight: 800, margin: 0, color: '#FFFFFF' }}>
-                      {isFr ? station.name : station.nameEn}
-                    </h3>
-                    {isSelected && (
-                      <span style={{
-                        background: '#FFB800',
-                        color: '#120224',
-                        padding: '2px 8px',
-                        borderRadius: '9999px',
-                        fontSize: '0.68rem',
-                        fontWeight: 800,
-                      }}>
-                        {isFr ? 'Votre Borne' : 'Your Kiosk'}
-                      </span>
-                    )}
-                  </div>
-                  <p style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.65)', margin: '4px 0 0 0' }}>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: '0 0 2px 0', color: '#FFFFFF' }}>
+                    {isFr ? station.name : station.nameEn}
+                  </h3>
+                  <p style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.65)', margin: 0 }}>
                     📍 {station.address}
                   </p>
                 </div>
 
-                {/* Status Dot */}
                 <span style={{
-                  display: 'inline-flex',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  color: station.isOnline ? '#34D399' : '#FBBF24',
+                  display: 'flex',
                   alignItems: 'center',
                   gap: '5px',
-                  padding: '3px 8px',
-                  borderRadius: '9999px',
-                  background: station.isOnline ? 'rgba(16, 185, 129, 0.18)' : 'rgba(245, 158, 11, 0.18)',
-                  color: station.isOnline ? '#34D399' : '#FBBF24',
-                  fontSize: '0.72rem',
-                  fontWeight: 700,
-                  whiteSpace: 'nowrap',
                 }}>
                   <span style={{
                     width: '6px',
@@ -257,80 +234,54 @@ function StationsContent() {
                 </span>
               </div>
 
-              {/* Slot Counters Matrix */}
+              {/* Slot Counters (Open clean typography, NO inner boxes!) */}
               {station.isOnline ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
-                  <div style={{
-                    background: 'rgba(255, 255, 255, 0.04)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    borderRadius: '12px',
-                    padding: '8px 10px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                  }}>
-                    <span style={{ fontSize: '1.2rem' }}>⚡</span>
-                    <div>
-                      <strong style={{ display: 'block', fontSize: '1rem', color: '#FFB800', fontWeight: 800 }}>
-                        {station.availableBatteries} / {station.totalSlots}
-                      </strong>
-                      <span style={{ fontSize: '0.68rem', color: 'rgba(255, 255, 255, 0.6)' }}>
-                        {isFr ? 'Batteries prêtes' : 'Ready to rent'}
-                      </span>
-                    </div>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  fontSize: '0.85rem',
+                  padding: '6px 0',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ color: '#FFB800', fontWeight: 800 }}>⚡ {station.availableBatteries}</span>
+                    <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.78rem' }}>
+                      {isFr ? 'prêtes' : 'ready'}
+                    </span>
                   </div>
 
-                  <div style={{
-                    background: 'rgba(255, 255, 255, 0.04)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    borderRadius: '12px',
-                    padding: '8px 10px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                  }}>
-                    <span style={{ fontSize: '1.2rem' }}>🔄</span>
-                    <div>
-                      <strong style={{ display: 'block', fontSize: '1rem', color: '#34D399', fontWeight: 800 }}>
-                        {station.emptySlots} {isFr ? 'libres' : 'free'}
-                      </strong>
-                      <span style={{ fontSize: '0.68rem', color: 'rgba(255, 255, 255, 0.6)' }}>
-                        {isFr ? 'Places de retour' : 'Return slots'}
-                      </span>
-                    </div>
+                  <span style={{ color: 'rgba(255, 255, 255, 0.25)' }}>•</span>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ color: '#34D399', fontWeight: 800 }}>🔄 {station.emptySlots}</span>
+                    <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.78rem' }}>
+                      {isFr ? 'places de retour' : 'return slots'}
+                    </span>
                   </div>
                 </div>
               ) : (
-                <div style={{
-                  padding: '8px 12px',
-                  borderRadius: '10px',
-                  background: 'rgba(245, 158, 11, 0.08)',
-                  border: '1px solid rgba(245, 158, 11, 0.2)',
-                  fontSize: '0.78rem',
-                  color: '#FBBF24',
-                }}>
+                <div style={{ fontSize: '0.8rem', color: '#FBBF24', padding: '4px 0' }}>
                   {isFr ? station.statusText : station.statusTextEn}
                 </div>
               )}
 
-              {/* Hours */}
-              <div style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.6)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              {/* Opening Hours */}
+              <div style={{ fontSize: '0.78rem', color: 'rgba(255, 255, 255, 0.55)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span>🕒</span>
                 <span>{isFr ? station.openingHours : station.openingHoursEn}</span>
               </div>
 
-              {/* Action Buttons */}
-              <div style={{ display: 'flex', gap: '8px', marginTop: '0.25rem' }}>
+              {/* Actions Row */}
+              <div style={{ display: 'flex', gap: '8px', marginTop: '0.35rem' }}>
                 <a
                   href={station.directionsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
                     flex: 1,
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: '12px',
-                    padding: '8px 12px',
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    borderRadius: '9999px',
+                    padding: '8px 14px',
                     color: '#FFFFFF',
                     fontSize: '0.8rem',
                     fontWeight: 700,
@@ -343,7 +294,7 @@ function StationsContent() {
                   }}
                 >
                   <span>📍</span>
-                  <span>{isFr ? 'Itinéraire GPS' : 'Get Directions'}</span>
+                  <span>{isFr ? 'Itinéraire GPS' : 'Directions'}</span>
                 </a>
 
                 {station.isOnline && (
@@ -353,8 +304,8 @@ function StationsContent() {
                       flex: 1,
                       background: 'linear-gradient(135deg, #FFA751 0%, #FFB800 100%)',
                       border: 'none',
-                      borderRadius: '12px',
-                      padding: '8px 12px',
+                      borderRadius: '9999px',
+                      padding: '8px 14px',
                       color: '#120224',
                       fontSize: '0.8rem',
                       fontWeight: 800,
@@ -375,30 +326,17 @@ function StationsContent() {
         })}
       </div>
 
-      {/* Return Rule Reassurance */}
+      {/* Return Reassurance Line (No box!) */}
       <div style={{
-        background: 'rgba(255, 255, 255, 0.04)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '16px',
-        padding: '1rem',
-        fontSize: '0.8rem',
-        color: 'rgba(255, 255, 255, 0.75)',
-        lineHeight: 1.4,
-        display: 'flex',
-        gap: '10px',
-        alignItems: 'center',
+        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+        paddingTop: '1.25rem',
+        fontSize: '0.82rem',
+        color: 'rgba(255, 255, 255, 0.65)',
+        lineHeight: 1.45,
       }}>
-        <span style={{ fontSize: '1.3rem' }}>🔄</span>
-        <div>
-          <strong style={{ color: '#FFFFFF', display: 'block', marginBottom: '2px' }}>
-            {isFr ? 'Restitution libre dans toute borne' : 'Return to any station'}
-          </strong>
-          <span>
-            {isFr 
-              ? 'Peu importe la borne d\'emprunt : insérez la batterie dans n\'importe quelle station IMỌLẸ à Lille pour terminer la location.'
-              : 'No matter where you rented: push the battery into any IMỌLẸ station in Lille to stop your rental.'}
-          </span>
-        </div>
+        🔄 {isFr
+          ? 'Restitution libre : glissez votre batterie dans n\'importe quelle borne IMỌLẸ à Lille pour terminer votre location.'
+          : 'Free return: slide your battery into any IMỌLẸ station in Lille to stop your rental.'}
       </div>
 
       <BottomNav activeTab="stations" />
@@ -413,4 +351,3 @@ export default function StationsPage() {
     </Suspense>
   );
 }
-
