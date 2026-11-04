@@ -92,7 +92,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     // Mobile Landing
     heroTitle: "Rechargez en toute liberté",
     kioskCardTitle: "Borne IMỌLẸ",
-    kioskCardSubtitle: "Batteries disponibles • 100% chargées",
+    kioskCardSubtitle: "Batteries disponibles",
     pricingHeader: "TARIFICATION TRANSPARENTE",
     pricing1stHour: "2,49 €",
     pricing1stHourLabel: "Déverrouillage + 1h",
@@ -157,7 +157,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     // Mobile Landing
     heroTitle: "Charge On The Go",
     kioskCardTitle: "IMỌLẸ Station",
-    kioskCardSubtitle: "Batteries available • 100% charged",
+    kioskCardSubtitle: "Batteries available",
     pricingHeader: "TRANSPARENT PRICING",
     pricing1stHour: "€2.49",
     pricing1stHourLabel: "Unlock + 1st hour",

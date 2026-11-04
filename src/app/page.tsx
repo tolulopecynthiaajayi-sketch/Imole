@@ -105,10 +105,10 @@ function LandingPageContent() {
               fontWeight: 700,
             }}>
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#34D399' }} />
-              {isFr ? 'Batterie Disponible • 100%' : 'Battery Available • 100%'}
+              {isFr ? 'Batterie Disponible' : 'Battery Available'}
             </span>
             <span style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.65)', fontWeight: 600 }}>
-              5000 mAh
+              6000 mAh
             </span>
           </div>
 
@@ -148,9 +148,6 @@ function LandingPageContent() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
             <span style={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.08em', color: '#6B7280', textTransform: 'uppercase' }}>
               {isFr ? 'Tarification' : 'Pricing'}
-            </span>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#059669', background: '#ECFDF5', padding: '2px 8px', borderRadius: '6px' }}>
-              {isFr ? 'Sans abonnement' : 'No Subscription'}
             </span>
           </div>
 

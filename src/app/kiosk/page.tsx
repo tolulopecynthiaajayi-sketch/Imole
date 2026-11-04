@@ -184,29 +184,7 @@ function KioskDisplay() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.4vw' }}>
-          {/* Subtle Live Beacon */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.55vw',
-            fontSize: '0.85vw',
-            fontWeight: 700,
-            color: '#34D399',
-          }}>
-            <span 
-              className="live-pulse-dot"
-              style={{
-                width: '9px',
-                height: '9px',
-                borderRadius: '50%',
-                backgroundColor: '#10B981',
-                display: 'inline-block',
-              }} 
-            />
-            <span>{isFr ? 'Borne Prête • Batteries 100%' : 'Station Ready • 100% Charged'}</span>
-          </div>
-
-          {/* Smooth Touch Language Toggle */}
+          {/* Flag Dropdown Language Toggle */}
           <LanguageToggle variant="dark" />
         </div>
       </header>
@@ -289,7 +267,7 @@ function KioskDisplay() {
                 letterSpacing: '0.04em',
                 textTransform: 'uppercase',
               }}>
-                {isCharging ? '⚡ Charge Ultra-Rapide' : '⚡ 5000 mAh'}
+                {isCharging ? '⚡ Charge Ultra-Rapide' : '⚡ 6000 mAh'}
               </span>
             </div>
           </div>
@@ -430,7 +408,7 @@ function KioskDisplay() {
             </span>
             <span style={{ color: 'rgba(255, 255, 255, 0.35)', margin: '0 0.3vw' }}>•</span>
             <span style={{ fontSize: '0.95vw', color: 'rgba(255, 255, 255, 0.65)' }}>
-              {isFr ? 'puis 1,99 € / h • Sans abonnement' : 'then €1.99 / hr • No subscription'}
+              {isFr ? 'puis 1,99 € / h' : 'then €1.99 / hr'}
             </span>
           </div>
 
