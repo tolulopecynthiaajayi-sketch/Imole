@@ -40,10 +40,10 @@ function ActiveRentalContent() {
     const extraHours = hours - 1;
     const total = 2.49 + (extraHours * 1.99);
     if (hours <= 24) {
-      return Math.min(total, 12.99).toFixed(2).replace('.', ',');
+      return Math.min(total, 14.99).toFixed(2).replace('.', ',');
     }
     const day2Hours = hours - 24;
-    return Math.min(12.99 + (day2Hours * 1.99), 24.99).toFixed(2).replace('.', ',');
+    return Math.min(14.99 + (day2Hours * 1.99), 24.99).toFixed(2).replace('.', ',');
   };
 
   const handleSimulateReturn = () => {
@@ -126,6 +126,26 @@ function ActiveRentalContent() {
             <span>{t('returnStep3')}</span>
           </div>
         </div>
+
+        {/* Link to Full Guide */}
+        <button
+          type="button"
+          onClick={() => router.push(`/how-it-works${kioskId ? `?station=${kioskId}` : ''}`)}
+          style={{
+            marginTop: '1rem',
+            width: '100%',
+            padding: '0.65rem',
+            borderRadius: '10px',
+            background: '#FAF7FD',
+            color: '#300E58',
+            border: '1px solid rgba(48, 14, 88, 0.15)',
+            fontWeight: 700,
+            fontSize: '0.78rem',
+            cursor: 'pointer',
+          }}
+        >
+          {t('howItWorksGuide')} →
+        </button>
 
         {/* Demo Return Trigger Button */}
         <button 

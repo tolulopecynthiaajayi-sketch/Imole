@@ -47,6 +47,15 @@ body {
   min-height: 100vh;
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes dropdownFadeIn {
   from {
     opacity: 0;

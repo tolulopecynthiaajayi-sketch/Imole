@@ -5,7 +5,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 
 // Pricing rules
 const MAX_CAP_CENTS = 2499; // €24.99 (48 hours)
-const DAILY_CAP_CENTS = 1299; // €12.99 (Day 1)
+const DAILY_CAP_CENTS = 1499; // €14.99 (Day 1)
 const BASE_RATE_CENTS = 249; // €2.49 for unlock + 1st hour
 const HOURLY_RATE_CENTS = 199; // €1.99 per subsequent hour
 

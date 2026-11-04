@@ -408,7 +408,7 @@ function KioskDisplay() {
             </span>
             <span style={{ color: 'rgba(255, 255, 255, 0.35)', margin: '0 0.3vw' }}>•</span>
             <span style={{ fontSize: '0.95vw', color: 'rgba(255, 255, 255, 0.65)' }}>
-              {isFr ? 'puis 1,99 € / h' : 'then €1.99 / hr'}
+              {isFr ? 'puis 1,99 € / h • Plafond 24h : 14,99 €' : 'then €1.99 / hr • 24h Cap: €14.99'}
             </span>
           </div>
 

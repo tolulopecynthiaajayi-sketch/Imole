@@ -38,7 +38,20 @@ export type TranslationKey =
   | 'depositNoticeText'
   | 'termsConsent'
   | 'unlockBtn'
+  | 'payNowBtn'
   | 'unlocking'
+  | 'howItWorksGuide'
+  | 'returnAnywhereTitle'
+  | 'returnAnywhereDesc'
+  | 'howItWorksTitle'
+  | 'howItWorksStep1Title'
+  | 'howItWorksStep1Desc'
+  | 'howItWorksStep2Title'
+  | 'howItWorksStep2Desc'
+  | 'howItWorksStep3Title'
+  | 'howItWorksStep3Desc'
+  | 'howItWorksStep4Title'
+  | 'howItWorksStep4Desc'
   
   // Active Rental Screen
   | 'activeRentalTitle'
@@ -82,7 +95,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     kioskSubtitle: "Batterie faible ? Emportez une batterie universelle en 30 secondes.",
     kioskTarifTitle: "Tarif sans engagement",
     kioskTarifMain: "2,49 € (1ère heure incluse)",
-    kioskTarifSub: "puis 1,99 € / h • Plafond 24h : 12,99 €",
+    kioskTarifSub: "puis 1,99 € / h • Plafond 24h : 14,99 €",
     kioskCompatTitle: "Compatibilité Universelle",
     kioskCompatSub: "iPhone (Lightning) • USB-C • Micro-USB",
     kioskScanPill: "Scannez pour déverrouiller",
@@ -95,16 +108,29 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     kioskCardSubtitle: "Batteries disponibles",
     pricingHeader: "TARIFICATION TRANSPARENTE",
     pricing1stHour: "2,49 €",
-    pricing1stHourLabel: "Déverrouillage + 1h",
+    pricing1stHourLabel: "1ère heure",
     pricingSubsequent: "1,99 €",
     pricingSubsequentLabel: "Par heure suppl.",
-    pricingDayCap: "12,99 €",
+    pricingDayCap: "14,99 €",
     pricingDayCapLabel: "Plafond 24h",
     depositNoticeTitle: "Empreinte bancaire de 24,99 €",
     depositNoticeText: "Garantie temporaire non débitée. Seul le temps réel consommé sera prélevé lors de la restitution.",
     termsConsent: "J'accepte les Conditions Générales d'Utilisation et l'empreinte temporaire.",
-    unlockBtn: "Déverrouiller avec Apple Pay / CB",
-    unlocking: "Connexion à la borne...",
+    unlockBtn: "Payer maintenant",
+    payNowBtn: "Payer maintenant",
+    unlocking: "Paiement en cours...",
+    howItWorksGuide: "Comment ça marche & retour ?",
+    returnAnywhereTitle: "Restitution dans n'importe quelle borne",
+    returnAnywhereDesc: "Déposez votre batterie dans n'importe quelle borne IMỌLẸ dans Paris. Enclenchez-la dans un slot libre : la location s'arrête instantanément.",
+    howItWorksTitle: "Guide d'utilisation & restitution",
+    howItWorksStep1Title: "1. Paiement en 1 clic",
+    howItWorksStep1Desc: "Validez avec Apple Pay, Google Pay ou CB. La batterie s'éjecte automatiquement.",
+    howItWorksStep2Title: "2. Recharger en liberté",
+    howItWorksStep2Desc: "Batterie 6000 mAh avec 3 câbles rapides intégrés (Lightning iPhone, USB-C, Micro-USB).",
+    howItWorksStep3Title: "3. Restitution libre",
+    howItWorksStep3Desc: "Insérez la batterie dans n'importe quelle station IMỌLẸ jusqu'au clic audible. La location s'arrête automatiquement.",
+    howItWorksStep4Title: "4. Tarification & Déblocage",
+    howItWorksStep4Desc: "2,49 € pour la 1ère heure, puis 1,99 € / h. Plafond garanti bloqué à 14,99 € par tranche de 24h. L'empreinte de 24,99 € est automatiquement débloquée.",
 
     // Active Screen
     activeRentalTitle: "Location en cours",
@@ -112,7 +138,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     liveTimerLabel: "Temps écoulé",
     chargingStatus: "● Batterie en cours d'utilisation",
     currentCostLabel: "Coût estimé actuel :",
-    costExplain: "1ère heure incluse • Plafond 24h bloqué à 12,99 €",
+    costExplain: "1ère heure incluse • Plafond 24h bloqué à 14,99 €",
     howToReturnTitle: "Comment restituer votre batterie ?",
     returnStep1: "Présentez-vous devant n'importe quelle borne IMỌLẸ.",
     returnStep2: "Insérez la batterie dans n'importe quel slot libre jusqu'au clic.",
@@ -147,7 +173,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     kioskSubtitle: "Low battery? Take a universal power bank in 30 seconds.",
     kioskTarifTitle: "No Commitment Pricing",
     kioskTarifMain: "€2.49 (1st hour included)",
-    kioskTarifSub: "then €1.99 / hr • 24h Cap: €12.99",
+    kioskTarifSub: "then €1.99 / hr • 24h Cap: €14.99",
     kioskCompatTitle: "Universal Compatibility",
     kioskCompatSub: "iPhone (Lightning) • USB-C • Micro-USB",
     kioskScanPill: "Scan to Unlock",
@@ -160,16 +186,29 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     kioskCardSubtitle: "Batteries available",
     pricingHeader: "TRANSPARENT PRICING",
     pricing1stHour: "€2.49",
-    pricing1stHourLabel: "Unlock + 1st hour",
+    pricing1stHourLabel: "1st hour",
     pricingSubsequent: "€1.99",
     pricingSubsequentLabel: "Per add. hour",
-    pricingDayCap: "€12.99",
+    pricingDayCap: "€14.99",
     pricingDayCapLabel: "24h Max Cap",
     depositNoticeTitle: "Temporary €24.99 hold",
     depositNoticeText: "A security hold placed on your card. You are only charged for actual rental time when you return.",
     termsConsent: "I accept the Terms of Service and temporary pre-authorization hold.",
-    unlockBtn: "Unlock with Apple Pay / Card",
-    unlocking: "Connecting to station...",
+    unlockBtn: "Pay Now",
+    payNowBtn: "Pay Now",
+    unlocking: "Processing payment...",
+    howItWorksGuide: "How it works & returns?",
+    returnAnywhereTitle: "Return at any station",
+    returnAnywhereDesc: "Return your battery to any available IMỌLẸ station in Paris. Slide it into any empty slot: your rental ends immediately.",
+    howItWorksTitle: "User & Return Guide",
+    howItWorksStep1Title: "1. Tap to Pay",
+    howItWorksStep1Desc: "Pay with Apple Pay, Google Pay, or Card in 1 tap. The battery pops out instantly.",
+    howItWorksStep2Title: "2. Charge Anywhere",
+    howItWorksStep2Desc: "6000 mAh battery with 3 built-in fast cables (iPhone Lightning, USB-C, Micro-USB).",
+    howItWorksStep3Title: "3. Return Anywhere",
+    howItWorksStep3Desc: "Slide the battery into any empty slot on any IMỌLẸ station until it clicks. Rental ends automatically.",
+    howItWorksStep4Title: "4. Pricing & Hold Release",
+    howItWorksStep4Desc: "€2.49 for the 1st hour, then €1.99 / hr. Guaranteed 24h cap at €14.99. The €24.99 hold is automatically released.",
 
     // Active Screen
     activeRentalTitle: "Active Rental",
@@ -177,7 +216,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     liveTimerLabel: "Elapsed Time",
     chargingStatus: "● Battery currently in use",
     currentCostLabel: "Current Estimated Cost:",
-    costExplain: "1st hour included • 24h max cost capped at €12.99",
+    costExplain: "1st hour included • 24h max cost capped at €14.99",
     howToReturnTitle: "How to return your power bank?",
     returnStep1: "Walk up to any IMỌLẸ station in the network.",
     returnStep2: "Push the battery into any empty slot until it clicks.",
