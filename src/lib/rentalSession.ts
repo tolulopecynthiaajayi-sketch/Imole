@@ -67,3 +67,4 @@ export function getLastReceipt(): { durationMinutes: number; cost: string; kiosk
     return null;
   }
 }
+
