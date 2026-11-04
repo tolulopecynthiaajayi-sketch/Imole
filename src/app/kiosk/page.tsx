@@ -360,10 +360,10 @@ function KioskDisplay() {
             {/* Headline */}
             <div>
               <h1 style={{
-                fontSize: '4vw',
+                fontSize: '3.9vw',
                 fontWeight: 800,
-                lineHeight: 1.05,
-                letterSpacing: '-0.035em',
+                lineHeight: 1.08,
+                letterSpacing: '-0.03em',
                 margin: 0,
               }}>
                 {isFr ? (
@@ -373,7 +373,8 @@ function KioskDisplay() {
                       background: 'linear-gradient(135deg, #FFB800 0%, #FFA000 100%)',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
-                    }}>100%</span> en 2 secondes.
+                      textShadow: '0 0 35px rgba(255, 184, 0, 0.35)',
+                    }}>100%</span> en 1 clic.
                   </>
                 ) : (
                   <>
@@ -382,14 +383,29 @@ function KioskDisplay() {
                       background: 'linear-gradient(135deg, #FFB800 0%, #FFA000 100%)',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
-                    }}>100%</span> in 2 seconds.
+                      textShadow: '0 0 35px rgba(255, 184, 0, 0.35)',
+                    }}>100%</span> in 1 click.
                   </>
                 )}
               </h1>
 
-              {/* Clean Pricing Line (NO 24H OR 48H CAP MENTIONED HERE) */}
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6vw', marginTop: '0.8vw' }}>
-                <span style={{ fontSize: '1.9vw', fontWeight: 800, color: '#FFB800', letterSpacing: '-0.02em' }}>
+              <p style={{
+                fontSize: '1.2vw',
+                color: 'rgba(255, 255, 255, 0.72)',
+                marginTop: '0.7vw',
+                marginBottom: 0,
+                fontWeight: 500,
+                lineHeight: 1.35,
+                maxWidth: '92%',
+              }}>
+                {isFr 
+                  ? 'Emportez une batterie universelle. Déposez-la dans n\'importe quelle borne à Lille.'
+                  : 'Take a universal power bank with you. Return it to any station in Lille.'}
+              </p>
+
+              {/* Clean Pricing Line */}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6vw', marginTop: '0.85vw' }}>
+                <span style={{ fontSize: '1.85vw', fontWeight: 800, color: '#FFB800', letterSpacing: '-0.02em' }}>
                   2,49 €
                 </span>
                 <span style={{ fontSize: '0.95vw', color: 'rgba(255, 255, 255, 0.85)', fontWeight: 600 }}>
@@ -402,16 +418,16 @@ function KioskDisplay() {
               </div>
             </div>
 
-            {/* FLUID DUAL OPTIONS (NO AI BOXES, BREATHABLE TYPOGRAPHY) */}
+            {/* DUAL PAYMENT OPTIONS ON THE SAME HORIZONTAL LINE */}
             <div style={{
               display: 'flex',
-              flexDirection: 'column',
-              gap: '1.2vw',
+              alignItems: 'center',
+              gap: '1.6vw',
               marginTop: '0.4vw',
-              paddingLeft: '0.2vw',
+              flexWrap: 'nowrap',
             }}>
               {/* Option 1: Direct Contactless Tap */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1vw' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.7vw' }}>
                 <div style={{
                   width: '2.4vw',
                   height: '2.4vw',
@@ -423,31 +439,43 @@ function KioskDisplay() {
                   justifyContent: 'center',
                   fontSize: '1.15vw',
                   flexShrink: 0,
-                  marginTop: '0.1vw',
                 }}>
                   💳
                 </div>
                 <div>
-                  <div style={{ fontSize: '1.2vw', fontWeight: 800, color: '#FFFFFF', lineHeight: 1.2 }}>
+                  <div style={{ fontSize: '1.08vw', fontWeight: 800, color: '#FFFFFF', whiteSpace: 'nowrap' }}>
                     {isFr ? 'Tapez votre carte ci-dessous' : 'Tap your card below'}
                   </div>
                   <div style={{
-                    fontSize: '0.85vw',
+                    fontSize: '0.76vw',
                     color: '#FFB800',
-                    fontWeight: 600,
-                    marginTop: '0.2vw',
+                    fontWeight: 700,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.4vw',
+                    gap: '0.3vw',
+                    whiteSpace: 'nowrap',
+                    marginTop: '0.1vw',
                   }}>
                     <span style={{ animation: 'bounceDown 1.4s infinite', display: 'inline-block' }}>↓</span>
-                    <span>{isFr ? 'Lecteur situé juste sous l\'écran' : 'Reader right below this screen'}</span>
+                    <span>{isFr ? 'Lecteur situé juste sous l\'écran' : 'Reader right below screen'}</span>
                   </div>
                 </div>
               </div>
 
+              {/* Elegant separator */}
+              <span style={{
+                color: 'rgba(255, 255, 255, 0.35)',
+                fontSize: '0.9vw',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+                flexShrink: 0,
+              }}>
+                {isFr ? 'ou' : 'or'}
+              </span>
+
               {/* Option 2: Mobile QR Scan */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1vw' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.7vw' }}>
                 <div style={{
                   width: '2.4vw',
                   height: '2.4vw',
@@ -459,16 +487,15 @@ function KioskDisplay() {
                   justifyContent: 'center',
                   fontSize: '1.15vw',
                   flexShrink: 0,
-                  marginTop: '0.1vw',
                 }}>
                   📱
                 </div>
                 <div>
-                  <div style={{ fontSize: '1.2vw', fontWeight: 800, color: '#FFFFFF', lineHeight: 1.2 }}>
-                    {isFr ? 'Ou scannez le QR code' : 'Or scan the QR code'}
+                  <div style={{ fontSize: '1.08vw', fontWeight: 800, color: '#FFFFFF', whiteSpace: 'nowrap' }}>
+                    {isFr ? 'Scannez le QR code' : 'Scan the QR code'}
                   </div>
-                  <div style={{ fontSize: '0.85vw', color: 'rgba(255, 255, 255, 0.65)', marginTop: '0.2vw' }}>
-                    {isFr ? 'Pour déverrouiller sur votre smartphone' : 'To unlock on your smartphone'}
+                  <div style={{ fontSize: '0.76vw', color: 'rgba(255, 255, 255, 0.65)', whiteSpace: 'nowrap', marginTop: '0.1vw' }}>
+                    {isFr ? 'Sur votre smartphone' : 'On your smartphone'}
                   </div>
                 </div>
               </div>
