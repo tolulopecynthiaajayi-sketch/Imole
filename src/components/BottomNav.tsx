@@ -10,12 +10,12 @@ interface BottomNavProps {
 
 export default function BottomNav({ activeTab = 'home' }: BottomNavProps) {
   const router = useRouter();
-  let isDark = true;
+  let isDark = false;
   try {
     const { theme } = useTheme();
     isDark = theme === 'dark';
   } catch {
-    isDark = true;
+    isDark = false;
   }
 
   const tabs = [
@@ -60,61 +60,83 @@ export default function BottomNav({ activeTab = 'home' }: BottomNavProps) {
     <nav style={{
       position: 'fixed',
       bottom: 0,
-      left: '50%',
-      transform: 'translateX(-50%)',
+      left: 0,
+      right: 0,
       width: '100%',
-      maxWidth: '460px',
-      backgroundColor: isDark ? 'rgba(18, 2, 36, 0.94)' : 'rgba(255, 255, 255, 0.94)',
-      backdropFilter: 'blur(20px)',
-      borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(0, 0, 0, 0.08)',
+      background: isDark
+        ? 'linear-gradient(to bottom, rgba(18, 2, 36, 0.8) 0%, rgba(23, 3, 46, 0.96) 100%)'
+        : 'linear-gradient(to bottom, rgba(250, 249, 254, 0.8) 0%, rgba(243, 241, 250, 0.96) 100%)',
+      backdropFilter: 'blur(20px) saturate(180%)',
+      WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+      borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid rgba(24, 4, 43, 0.05)',
       display: 'flex',
-      justifyContent: 'space-around',
+      justifyContent: 'center',
       alignItems: 'center',
-      padding: '0.6rem 0.5rem 1.4rem 0.5rem',
+      paddingTop: '0.65rem',
+      paddingBottom: 'calc(0.85rem + env(safe-area-inset-bottom, 0px))',
+      paddingLeft: '1rem',
+      paddingRight: '1rem',
       zIndex: 50,
-      boxShadow: isDark ? '0 -10px 30px rgba(0, 0, 0, 0.5)' : '0 -4px 20px rgba(0, 0, 0, 0.05)',
-      transition: 'all 0.2s ease',
+      transition: 'background 0.25s ease, border-color 0.25s ease',
     }}>
-      {tabs.map((tab) => {
-        const isActive = activeTab === tab.id;
-        const activeColor = isDark ? '#FFB800' : '#18042B';
-        const inactiveColor = isDark ? 'rgba(255, 255, 255, 0.45)' : '#9CA3AF';
+      <div style={{
+        maxWidth: '440px',
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+      }}>
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          const activeColor = isDark ? '#FFB800' : '#18042B';
+          const inactiveColor = isDark ? 'rgba(255, 255, 255, 0.45)' : '#9CA3AF';
 
-        return (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => router.push(tab.path)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '4px',
-              color: isActive ? activeColor : inactiveColor,
-              transition: 'all 0.2s ease',
-              padding: '4px 16px',
-              cursor: 'pointer',
-            }}
-          >
-            <div style={{
-              transform: isActive ? 'scale(1.1)' : 'scale(1)',
-              transition: 'transform 0.2s ease',
-              filter: isActive && isDark ? 'drop-shadow(0 0 8px rgba(255, 184, 0, 0.5))' : 'none',
-            }}>
-              {tab.icon}
-            </div>
-            <span style={{
-              fontSize: '0.72rem',
-              fontWeight: isActive ? 800 : 500,
-              letterSpacing: '-0.01em',
-            }}>
-              {tab.label}
-            </span>
-          </button>
-        );
-      })}
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => router.push(tab.path)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '3px',
+                color: isActive ? activeColor : inactiveColor,
+                transition: 'all 0.2s ease',
+                padding: '4px 20px',
+                cursor: 'pointer',
+                position: 'relative',
+              }}
+            >
+              <div style={{
+                transform: isActive ? 'scale(1.08)' : 'scale(1)',
+                transition: 'transform 0.2s ease',
+                filter: isActive && isDark ? 'drop-shadow(0 0 8px rgba(255, 184, 0, 0.4))' : 'none',
+              }}>
+                {tab.icon}
+              </div>
+              <span style={{
+                fontSize: '0.72rem',
+                fontWeight: isActive ? 700 : 500,
+                letterSpacing: '-0.01em',
+              }}>
+                {tab.label}
+              </span>
+              {isActive && (
+                <div style={{
+                  width: '14px',
+                  height: '2px',
+                  borderRadius: '2px',
+                  backgroundColor: activeColor,
+                  marginTop: '1px',
+                }} />
+              )}
+            </button>
+          );
+        })}
+      </div>
     </nav>
   );
 }

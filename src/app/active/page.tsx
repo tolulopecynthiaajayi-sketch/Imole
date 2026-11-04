@@ -131,29 +131,31 @@ function ActiveRentalContent() {
         }}>
           {/* Luminous Golden Circular Timer */}
           <div style={{
-            width: '200px',
-            height: '200px',
+            width: '240px',
+            height: '240px',
             borderRadius: '50%',
             background: isDark
               ? 'radial-gradient(circle, rgba(255, 184, 0, 0.12) 0%, rgba(18, 2, 36, 0.85) 70%)'
-              : 'radial-gradient(circle, rgba(255, 184, 0, 0.15) 0%, #FFFFFF 70%)',
-            border: `4px solid ${accentGold}`,
+              : 'radial-gradient(circle, rgba(255, 184, 0, 0.12) 0%, #FFFFFF 72%)',
+            border: `3.5px solid ${accentGold}`,
             boxShadow: isDark
-              ? '0 0 45px rgba(255, 184, 0, 0.3), inset 0 0 25px rgba(255, 184, 0, 0.15)'
-              : '0 10px 30px rgba(180, 83, 9, 0.15)',
+              ? '0 0 50px rgba(255, 184, 0, 0.28), inset 0 0 30px rgba(255, 184, 0, 0.12)'
+              : '0 12px 35px rgba(180, 83, 9, 0.12), inset 0 0 25px rgba(255, 184, 0, 0.08)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '0.35rem',
+            gap: '0.4rem',
+            padding: '1.25rem',
             marginBottom: '1.5rem',
           }}>
             <span style={{
-              fontSize: '2.35rem',
+              fontSize: '2.15rem',
               fontWeight: 800,
               color: textPrimary,
               fontFamily: 'monospace',
-              letterSpacing: '0.04em',
+              letterSpacing: '0.02em',
+              lineHeight: 1,
             }}>
               {formatTime(elapsedMs)}
             </span>
