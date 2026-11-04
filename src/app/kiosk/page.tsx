@@ -11,14 +11,16 @@ function KioskDisplay() {
   const { lang } = useI18n();
   const searchParams = useSearchParams();
   const kioskParam = searchParams.get('kiosk') || 'H00000147A';
-  const initialStatus = searchParams.get('status') as 'idle' | 'dispense' | 'return' | null;
+  const initialStatus = searchParams.get('status') as 'idle' | 'confirmation' | 'dispense' | 'return' | null;
   
   const rentalUrl = `https://imole.fr/?kiosk=${kioskParam}`;
   const isFr = lang === 'fr';
 
-  // Kiosk state: 'idle' | 'dispensing' | 'returned'
-  const [kioskState, setKioskState] = useState<'idle' | 'dispensing' | 'returned'>(
-    initialStatus === 'dispense' ? 'dispensing' : initialStatus === 'return' ? 'returned' : 'idle'
+  // Kiosk state: 'idle' | 'confirmation' | 'dispensing' | 'returned'
+  const [kioskState, setKioskState] = useState<'idle' | 'confirmation' | 'dispensing' | 'returned'>(
+    initialStatus === 'confirmation' ? 'confirmation' :
+    initialStatus === 'dispense' ? 'dispensing' :
+    initialStatus === 'return' ? 'returned' : 'idle'
   );
   const [activeSlot, setActiveSlot] = useState(3);
   const [batteryId] = useState('BAT-F20002DD6A');
@@ -43,9 +45,18 @@ function KioskDisplay() {
     return () => clearInterval(cycle);
   }, [kioskState]);
 
+  // If in confirmation state, auto-advance to dispensing after 5 seconds
+  useEffect(() => {
+    if (kioskState !== 'confirmation') return;
+    const timer = setTimeout(() => {
+      setKioskState('dispensing');
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [kioskState]);
+
   // Auto-reset from dispensing or returned after 20 seconds
   useEffect(() => {
-    if (kioskState === 'idle') return;
+    if (kioskState === 'idle' || kioskState === 'confirmation') return;
     const timer = setTimeout(() => {
       setKioskState('idle');
     }, 20000);
@@ -186,7 +197,7 @@ function KioskDisplay() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1vw' }}>
-          {/* Hardware Demo State Simulator (Useful for testing & presentations) */}
+          {/* Hardware Demo State Simulator */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -210,6 +221,22 @@ function KioskDisplay() {
               }}
             >
               {isFr ? 'Accueil' : 'Attract'}
+            </button>
+            <button
+              onClick={() => setKioskState('confirmation')}
+              style={{
+                background: kioskState === 'confirmation' ? '#FFB800' : 'transparent',
+                color: kioskState === 'confirmation' ? '#120224' : 'rgba(255, 255, 255, 0.7)',
+                border: 'none',
+                borderRadius: '9999px',
+                padding: '4px 10px',
+                fontSize: '0.72vw',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+            >
+              {isFr ? '💳 Test Tap' : '💳 Test Tap'}
             </button>
             <button
               onClick={() => {
@@ -248,31 +275,30 @@ function KioskDisplay() {
             </button>
           </div>
 
-          {/* Language Flag Selector */}
           <LanguageToggle variant="dark" />
         </div>
       </header>
 
       {/* 2. DYNAMIC CENTER CONTENT BASED ON STATE */}
 
-      {/* STATE A: IDLE / ATTRACT SCREEN (DUAL CHOICE: TAPEZ CI-DESSOUS OU SCANNEZ) */}
+      {/* STATE A: IDLE / ATTRACT SCREEN (CLEAN, NO AI BOXES, NO 24H/48H CAP, NO POINT CAMERA TEXT) */}
       {kioskState === 'idle' && (
         <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           flex: 1,
-          gap: '4vw',
+          gap: '4.5vw',
           zIndex: 5,
           margin: '0.8vw 0',
         }}>
-          {/* Left Column: Emotion + Battery Meter + Dual Choice Cards */}
+          {/* Left Column: Emotion + Battery Meter + Clean Fluid Options (Zero Boxes) */}
           <div style={{
             flex: 1.35,
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            gap: '1.4vw',
+            gap: '1.6vw',
           }}>
             {/* Battery Indicator Bar */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1vw' }}>
@@ -334,7 +360,7 @@ function KioskDisplay() {
             {/* Headline */}
             <div>
               <h1 style={{
-                fontSize: '3.8vw',
+                fontSize: '4vw',
                 fontWeight: 800,
                 lineHeight: 1.05,
                 letterSpacing: '-0.035em',
@@ -361,151 +387,100 @@ function KioskDisplay() {
                 )}
               </h1>
 
-              {/* Pricing Line */}
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5vw', marginTop: '0.7vw' }}>
-                <span style={{ fontSize: '1.75vw', fontWeight: 800, color: '#FFB800' }}>
+              {/* Clean Pricing Line (NO 24H OR 48H CAP MENTIONED HERE) */}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6vw', marginTop: '0.8vw' }}>
+                <span style={{ fontSize: '1.9vw', fontWeight: 800, color: '#FFB800', letterSpacing: '-0.02em' }}>
                   2,49 €
                 </span>
-                <span style={{ fontSize: '0.9vw', color: 'rgba(255, 255, 255, 0.85)', fontWeight: 600 }}>
+                <span style={{ fontSize: '0.95vw', color: 'rgba(255, 255, 255, 0.85)', fontWeight: 600 }}>
                   {isFr ? '(1ère heure incluse)' : '(1st hour included)'}
                 </span>
-                <span style={{ color: 'rgba(255, 255, 255, 0.3)' }}>•</span>
-                <span style={{ fontSize: '0.85vw', color: 'rgba(255, 255, 255, 0.65)' }}>
-                  {isFr ? 'puis 1,99 € / h • Plafond 24h : 14,99 €' : 'then €1.99 / hr • 24h Cap: €14.99'}
+                <span style={{ color: 'rgba(255, 255, 255, 0.3)', margin: '0 0.2vw' }}>•</span>
+                <span style={{ fontSize: '0.95vw', color: 'rgba(255, 255, 255, 0.7)' }}>
+                  {isFr ? 'puis 1,99 € / h' : 'then €1.99 / hr'}
                 </span>
               </div>
             </div>
 
-            {/* DUAL PAYMENT METHOD CARDS (PHYSICAL TAP OR QR SCAN) */}
+            {/* FLUID DUAL OPTIONS (NO AI BOXES, BREATHABLE TYPOGRAPHY) */}
             <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1.05fr 1fr',
-              gap: '0.9vw',
-              marginTop: '0.2vw',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.2vw',
+              marginTop: '0.4vw',
+              paddingLeft: '0.2vw',
             }}>
-              {/* Option A: Direct Contactless Tap on Nayax Reader */}
-              <div style={{
-                background: 'linear-gradient(135deg, rgba(255, 184, 0, 0.14) 0%, rgba(255, 184, 0, 0.04) 100%)',
-                border: '1.5px solid rgba(255, 184, 0, 0.5)',
-                borderRadius: '1.1vw',
-                padding: '0.9vw 1.1vw',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.3vw',
-                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{
-                    fontSize: '0.75vw',
-                    fontWeight: 800,
-                    color: '#FFB800',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.06em',
-                  }}>
-                    💳 {isFr ? 'Option 1 : Sans Contact' : 'Option 1: Tap to Pay'}
-                  </span>
-                  <span style={{
-                    fontSize: '0.65vw',
-                    background: 'rgba(255, 184, 0, 0.2)',
-                    color: '#FFB800',
-                    padding: '0.15vw 0.45vw',
-                    borderRadius: '9999px',
-                    fontWeight: 800,
-                  }}>
-                    {isFr ? 'Instantané' : 'Instant'}
-                  </span>
-                </div>
-
-                <div style={{ fontSize: '1.05vw', fontWeight: 800, color: '#FFFFFF', lineHeight: 1.15 }}>
-                  {isFr ? 'Tapez votre carte ci-dessous' : 'Tap your card below'}
-                </div>
-
-                <p style={{ fontSize: '0.75vw', color: 'rgba(255, 255, 255, 0.72)', margin: 0, lineHeight: 1.3 }}>
-                  {isFr 
-                    ? 'Lecteur Nayax • CB, Apple Pay, Visa, Mastercard (Caution temporaire 24,99 €)'
-                    : 'Nayax reader • Debit, Apple Pay, Visa, Mastercard (Temp hold €24.99)'}
-                </p>
-
-                {/* Pulsing Down Arrow towards physical Nayax Reader */}
+              {/* Option 1: Direct Contactless Tap */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1vw' }}>
                 <div style={{
+                  width: '2.4vw',
+                  height: '2.4vw',
+                  borderRadius: '50%',
+                  background: 'rgba(255, 184, 0, 0.15)',
+                  color: '#FFB800',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.35vw',
-                  fontSize: '0.75vw',
-                  color: '#FFB800',
-                  fontWeight: 700,
-                  marginTop: '0.2vw',
+                  justifyContent: 'center',
+                  fontSize: '1.15vw',
+                  flexShrink: 0,
+                  marginTop: '0.1vw',
                 }}>
-                  <span style={{ animation: 'bounceDown 1.4s infinite', display: 'inline-block', fontSize: '0.9vw' }}>↓</span>
-                  <span>{isFr ? 'Lecteur situé juste sous cet écran' : 'Reader right below this screen'}</span>
+                  💳
+                </div>
+                <div>
+                  <div style={{ fontSize: '1.2vw', fontWeight: 800, color: '#FFFFFF', lineHeight: 1.2 }}>
+                    {isFr ? 'Tapez votre carte ci-dessous' : 'Tap your card below'}
+                  </div>
+                  <div style={{
+                    fontSize: '0.85vw',
+                    color: '#FFB800',
+                    fontWeight: 600,
+                    marginTop: '0.2vw',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4vw',
+                  }}>
+                    <span style={{ animation: 'bounceDown 1.4s infinite', display: 'inline-block' }}>↓</span>
+                    <span>{isFr ? 'Lecteur situé juste sous l\'écran' : 'Reader right below this screen'}</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Option B: Mobile Smartphone QR Scan */}
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1.5px solid rgba(255, 255, 255, 0.15)',
-                borderRadius: '1.1vw',
-                padding: '0.9vw 1.1vw',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.3vw',
-                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{
-                    fontSize: '0.75vw',
-                    fontWeight: 800,
-                    color: 'rgba(255, 255, 255, 0.85)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.06em',
-                  }}>
-                    📱 {isFr ? 'Option 2 : Smartphone' : 'Option 2: Phone'}
-                  </span>
-                  <span style={{
-                    fontSize: '0.65vw',
-                    background: 'rgba(52, 211, 153, 0.18)',
-                    color: '#34D399',
-                    padding: '0.15vw 0.45vw',
-                    borderRadius: '9999px',
-                    fontWeight: 800,
-                  }}>
-                    {isFr ? 'Sans appli' : 'No App'}
-                  </span>
-                </div>
-
-                <div style={{ fontSize: '1.05vw', fontWeight: 800, color: '#FFFFFF', lineHeight: 1.15 }}>
-                  {isFr ? 'Scannez le QR à droite' : 'Scan the QR on right'}
-                </div>
-
-                <p style={{ fontSize: '0.75vw', color: 'rgba(255, 255, 255, 0.72)', margin: 0, lineHeight: 1.3 }}>
-                  {isFr
-                    ? 'Ouvrez votre appareil photo • Suivi du temps en direct sur votre téléphone'
-                    : 'Open camera • Live timer tracking on your mobile'}
-                </p>
-
+              {/* Option 2: Mobile QR Scan */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1vw' }}>
                 <div style={{
+                  width: '2.4vw',
+                  height: '2.4vw',
+                  borderRadius: '50%',
+                  background: 'rgba(52, 211, 153, 0.15)',
+                  color: '#34D399',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.35vw',
-                  fontSize: '0.75vw',
-                  color: '#34D399',
-                  fontWeight: 700,
-                  marginTop: '0.2vw',
+                  justifyContent: 'center',
+                  fontSize: '1.15vw',
+                  flexShrink: 0,
+                  marginTop: '0.1vw',
                 }}>
-                  <span>→</span>
-                  <span>{isFr ? 'Visez le socle blanc avec votre téléphone' : 'Point camera at the pedestal'}</span>
+                  📱
+                </div>
+                <div>
+                  <div style={{ fontSize: '1.2vw', fontWeight: 800, color: '#FFFFFF', lineHeight: 1.2 }}>
+                    {isFr ? 'Ou scannez le QR code' : 'Or scan the QR code'}
+                  </div>
+                  <div style={{ fontSize: '0.85vw', color: 'rgba(255, 255, 255, 0.65)', marginTop: '0.2vw' }}>
+                    {isFr ? 'Pour déverrouiller sur votre smartphone' : 'To unlock on your smartphone'}
+                  </div>
                 </div>
               </div>
             </div>
 
           </div>
 
-          {/* Right Column: High-Contrast QR Code Pedestal with Active Laser */}
+          {/* Right Column: Pure Minimal White QR Pedestal (NO CAMERA INSTRUCTIONS, NO CARD BRAND LIST) */}
           <div 
             className="floating-element"
             style={{
-              flex: 0.82,
+              flex: 0.8,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -515,8 +490,8 @@ function KioskDisplay() {
           >
             <div style={{
               background: '#FFFFFF',
-              padding: '1.6vw',
-              borderRadius: '2.2vw',
+              padding: '1.8vw',
+              borderRadius: '2.4vw',
               boxShadow: '0 25px 70px rgba(0, 0, 0, 0.65), 0 0 60px rgba(255, 184, 0, 0.25)',
               display: 'flex',
               flexDirection: 'column',
@@ -536,41 +511,174 @@ function KioskDisplay() {
               }}>
                 <QRCodeSVG 
                   value={rentalUrl} 
-                  size={220}
+                  size={230}
                   level="H"
                   fgColor="#18042B"
                 />
               </div>
 
-              <div style={{ textAlign: 'center' }}>
-                <span style={{
-                  display: 'inline-block',
-                  background: 'linear-gradient(135deg, #18042B 0%, #300E58 100%)',
-                  color: '#FFFFFF',
-                  padding: '0.4vw 1.2vw',
-                  borderRadius: '9999px',
-                  fontWeight: 800,
-                  fontSize: '0.85vw',
-                  letterSpacing: '-0.01em',
-                }}>
-                  {isFr ? '📱 Pointez votre appareil photo' : '📱 Point your phone camera'}
-                </span>
-                <p style={{
-                  fontSize: '0.72vw',
-                  fontWeight: 600,
-                  color: '#6B7280',
-                  marginTop: '0.35vw',
-                  marginBottom: 0,
-                }}>
-                  Apple Pay • Google Pay • Carte Bancaire
-                </p>
-              </div>
+              <span style={{
+                fontSize: '0.85vw',
+                fontWeight: 800,
+                color: '#18042B',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+              }}>
+                imole.fr
+              </span>
             </div>
           </div>
         </div>
       )}
 
-      {/* STATE B: DISPENSING / HARDWARE UNLOCK FEEDBACK */}
+      {/* STATE B: CONFIRMATION SCREEN (WHEN SOMEONE TAPS A CARD ON NAYAX) */}
+      {kioskState === 'confirmation' && (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          flex: 1,
+          zIndex: 5,
+          maxWidth: '820px',
+          margin: '0 auto',
+          width: '100%',
+        }}>
+          {/* Header Status */}
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5vw',
+            background: 'rgba(255, 184, 0, 0.15)',
+            border: '1px solid rgba(255, 184, 0, 0.4)',
+            borderRadius: '9999px',
+            padding: '0.4vw 1.2vw',
+            color: '#FFB800',
+            fontWeight: 800,
+            fontSize: '0.85vw',
+            width: 'fit-content',
+            marginBottom: '1vw',
+          }}>
+            <span>💳</span>
+            <span>{isFr ? 'CARTE DÉTECTÉE — CONFIRMATION' : 'CARD DETECTED — CONFIRMATION'}</span>
+          </div>
+
+          <h1 style={{ fontSize: '3.6vw', fontWeight: 800, margin: '0 0 0.8vw 0', lineHeight: 1.1 }}>
+            {isFr ? 'Détail de votre location' : 'Rental Confirmation'}
+          </h1>
+
+          <p style={{ fontSize: '1.2vw', color: 'rgba(255, 255, 255, 0.8)', margin: '0 0 2vw 0', lineHeight: 1.4 }}>
+            {isFr
+              ? 'Votre autorisation bancaire a été reçue. Voici les tarifs appliqués à cette location :'
+              : 'Your payment card has been approved. Here are the rates for this rental:'}
+          </p>
+
+          {/* Pricing Highlight Row (Fluid Layout, Clear Numbers) */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '1.2vw',
+            marginBottom: '2.5vw',
+          }}>
+            <div style={{
+              background: 'rgba(255, 184, 0, 0.12)',
+              border: '1.5px solid rgba(255, 184, 0, 0.45)',
+              borderRadius: '1.2vw',
+              padding: '1.2vw',
+            }}>
+              <span style={{ fontSize: '0.78vw', color: '#FFB800', fontWeight: 700, textTransform: 'uppercase' }}>
+                {isFr ? '1ère Heure' : '1st Hour'}
+              </span>
+              <div style={{ fontSize: '2vw', fontWeight: 800, color: '#FFFFFF', marginTop: '0.3vw' }}>
+                2,49 €
+              </div>
+              <span style={{ fontSize: '0.75vw', color: 'rgba(255, 255, 255, 0.65)' }}>
+                {isFr ? 'Déverrouillage inclus' : 'Unlock included'}
+              </span>
+            </div>
+
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              borderRadius: '1.2vw',
+              padding: '1.2vw',
+            }}>
+              <span style={{ fontSize: '0.78vw', color: 'rgba(255, 255, 255, 0.6)', fontWeight: 700, textTransform: 'uppercase' }}>
+                {isFr ? 'Heures suivantes' : 'Next Hours'}
+              </span>
+              <div style={{ fontSize: '2vw', fontWeight: 800, color: '#FFFFFF', marginTop: '0.3vw' }}>
+                1,99 €
+              </div>
+              <span style={{ fontSize: '0.75vw', color: 'rgba(255, 255, 255, 0.65)' }}>
+                {isFr ? 'Par heure entamée' : 'Per hour'}
+              </span>
+            </div>
+
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              borderRadius: '1.2vw',
+              padding: '1.2vw',
+            }}>
+              <span style={{ fontSize: '0.78vw', color: 'rgba(255, 255, 255, 0.6)', fontWeight: 700, textTransform: 'uppercase' }}>
+                {isFr ? 'Plafond 24h' : '24h Max Cap'}
+              </span>
+              <div style={{ fontSize: '2vw', fontWeight: 800, color: '#FFFFFF', marginTop: '0.3vw' }}>
+                14,99 €
+              </div>
+              <span style={{ fontSize: '0.75vw', color: 'rgba(255, 255, 255, 0.65)' }}>
+                {isFr ? 'Max par tranche de 24h' : 'Max per 24 hours'}
+              </span>
+            </div>
+
+            <div style={{
+              background: 'rgba(16, 185, 129, 0.1)',
+              border: '1px solid rgba(16, 185, 129, 0.35)',
+              borderRadius: '1.2vw',
+              padding: '1.2vw',
+            }}>
+              <span style={{ fontSize: '0.78vw', color: '#10B981', fontWeight: 700, textTransform: 'uppercase' }}>
+                {isFr ? 'Caution Empreinte' : 'Temporary Hold'}
+              </span>
+              <div style={{ fontSize: '2vw', fontWeight: 800, color: '#10B981', marginTop: '0.3vw' }}>
+                24,99 €
+              </div>
+              <span style={{ fontSize: '0.75vw', color: 'rgba(255, 255, 255, 0.65)' }}>
+                {isFr ? 'Non débitée • Libérée au retour' : 'Released upon return'}
+              </span>
+            </div>
+          </div>
+
+          {/* Action / Auto-dispensing indicator */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8vw', fontSize: '1.1vw', color: '#FFB800', fontWeight: 700 }}>
+              <span className="live-pulse-dot" style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#FFB800', display: 'inline-block' }} />
+              <span>{isFr ? 'Éjection de votre batterie en Fente 3...' : 'Dispensing power bank in Slot 3...'}</span>
+            </div>
+
+            <button
+              onClick={() => setKioskState('dispensing')}
+              style={{
+                background: '#10B981',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '9999px',
+                padding: '0.8vw 1.8vw',
+                fontSize: '1vw',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5vw',
+              }}
+            >
+              <span>{isFr ? 'Prendre ma batterie' : 'Get Power Bank'}</span>
+              <span>→</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* STATE C: DISPENSING / HARDWARE UNLOCK FEEDBACK */}
       {kioskState === 'dispensing' && (
         <div style={{
           display: 'flex',
@@ -597,7 +705,7 @@ function KioskDisplay() {
               width: 'fit-content',
             }}>
               <span style={{ fontSize: '1.2vw' }}>🎉</span>
-              <span>{isFr ? 'PAIEMENT APPROUVÉ — DÉVERROUILLAGE EN COURS' : 'PAYMENT APPROVED — DISPENSING'}</span>
+              <span>{isFr ? 'DÉVERROUILLAGE EFFECTUÉ' : 'POWER BANK UNLOCKED'}</span>
             </div>
 
             <h1 style={{ fontSize: '3.6vw', fontWeight: 800, margin: 0, lineHeight: 1.1 }}>
@@ -709,7 +817,7 @@ function KioskDisplay() {
         </div>
       )}
 
-      {/* STATE C: RETURN SUCCESS FEEDBACK */}
+      {/* STATE D: RETURN SUCCESS FEEDBACK */}
       {kioskState === 'returned' && (
         <div style={{
           display: 'flex',
@@ -835,7 +943,7 @@ function KioskDisplay() {
         </div>
       )}
 
-      {/* 3. MINIMALIST FOOTER: Built-in Cables & Dual Security Guarantees */}
+      {/* 3. MINIMALIST FOOTER: Built-in Cables & Clean Security Line */}
       <footer style={{
         display: 'flex',
         alignItems: 'center',
@@ -848,18 +956,18 @@ function KioskDisplay() {
         {/* Built-in Cables Indicator */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8vw' }}>
           <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontWeight: 600 }}>
-            {isFr ? 'Câbles inclus sur chaque batterie :' : 'Cables included on each power bank:'}
+            {isFr ? 'Câbles inclus :' : 'Cables included:'}
           </span>
-          <span style={{ color: '#FFB800', fontWeight: 700 }}>⚡ Lightning (iPhone)</span>
+          <span style={{ color: '#FFB800', fontWeight: 700 }}>⚡ Lightning</span>
           <span style={{ color: 'rgba(255, 255, 255, 0.3)' }}>•</span>
           <span style={{ color: '#FFB800', fontWeight: 700 }}>⚡ USB Type-C</span>
           <span style={{ color: 'rgba(255, 255, 255, 0.3)' }}>•</span>
           <span style={{ color: '#FFB800', fontWeight: 700 }}>⚡ Micro-USB</span>
         </div>
 
-        {/* Dual Nayax & Stripe Trust Badges */}
+        {/* Security Assurance */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1vw', color: 'rgba(255, 255, 255, 0.65)' }}>
-          <span>🔒 {isFr ? 'Paiement certifié Nayax & Stripe' : 'Certified Nayax & Stripe Payments'}</span>
+          <span>🔒 {isFr ? 'Paiement sécurisé' : 'Secure Payments'}</span>
           <span>•</span>
           <span>⚡ {isFr ? 'Protection anti-surchauffe certifiée CE' : 'CE-Certified Overheat Protection'}</span>
         </div>
