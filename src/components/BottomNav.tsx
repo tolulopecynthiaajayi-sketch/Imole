@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from './ThemeProvider';
 
 interface BottomNavProps {
   activeTab?: 'home' | 'stations' | 'history' | 'account';
@@ -9,6 +10,13 @@ interface BottomNavProps {
 
 export default function BottomNav({ activeTab = 'home' }: BottomNavProps) {
   const router = useRouter();
+  let isDark = true;
+  try {
+    const { theme } = useTheme();
+    isDark = theme === 'dark';
+  } catch {
+    isDark = true;
+  }
 
   const tabs = [
     {
@@ -56,18 +64,22 @@ export default function BottomNav({ activeTab = 'home' }: BottomNavProps) {
       transform: 'translateX(-50%)',
       width: '100%',
       maxWidth: '460px',
-      backgroundColor: 'rgba(18, 2, 36, 0.94)',
+      backgroundColor: isDark ? 'rgba(18, 2, 36, 0.94)' : 'rgba(255, 255, 255, 0.94)',
       backdropFilter: 'blur(20px)',
-      borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+      borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(0, 0, 0, 0.08)',
       display: 'flex',
       justifyContent: 'space-around',
       alignItems: 'center',
       padding: '0.6rem 0.5rem 1.4rem 0.5rem',
       zIndex: 50,
-      boxShadow: '0 -10px 30px rgba(0, 0, 0, 0.5)',
+      boxShadow: isDark ? '0 -10px 30px rgba(0, 0, 0, 0.5)' : '0 -4px 20px rgba(0, 0, 0, 0.05)',
+      transition: 'all 0.2s ease',
     }}>
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
+        const activeColor = isDark ? '#FFB800' : '#18042B';
+        const inactiveColor = isDark ? 'rgba(255, 255, 255, 0.45)' : '#9CA3AF';
+
         return (
           <button
             key={tab.id}
@@ -80,7 +92,7 @@ export default function BottomNav({ activeTab = 'home' }: BottomNavProps) {
               flexDirection: 'column',
               alignItems: 'center',
               gap: '4px',
-              color: isActive ? '#FFB800' : 'rgba(255, 255, 255, 0.5)',
+              color: isActive ? activeColor : inactiveColor,
               transition: 'all 0.2s ease',
               padding: '4px 16px',
               cursor: 'pointer',
@@ -89,7 +101,7 @@ export default function BottomNav({ activeTab = 'home' }: BottomNavProps) {
             <div style={{
               transform: isActive ? 'scale(1.1)' : 'scale(1)',
               transition: 'transform 0.2s ease',
-              filter: isActive ? 'drop-shadow(0 0 8px rgba(255, 184, 0, 0.5))' : 'none',
+              filter: isActive && isDark ? 'drop-shadow(0 0 8px rgba(255, 184, 0, 0.5))' : 'none',
             }}>
               {tab.icon}
             </div>

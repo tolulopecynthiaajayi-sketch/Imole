@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { I18nProvider } from '@/components/I18nProvider';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 export const metadata: Metadata = {
   title: 'IMỌLẸ Power Bank Sharing',
@@ -15,9 +16,11 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body>
-        <I18nProvider>
-          {children}
-        </I18nProvider>
+        <ThemeProvider>
+          <I18nProvider>
+            {children}
+          </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

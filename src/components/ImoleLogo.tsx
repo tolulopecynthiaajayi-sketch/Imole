@@ -1,11 +1,22 @@
+"use client";
+
 import React from 'react';
+import { useTheme } from './ThemeProvider';
 
 interface ImoleLogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   light?: boolean;
 }
 
-export default function ImoleLogo({ size = 'md', light = true }: ImoleLogoProps) {
+export default function ImoleLogo({ size = 'md', light }: ImoleLogoProps) {
+  let isLight = true;
+  try {
+    const { theme } = useTheme();
+    isLight = light !== undefined ? light : theme === 'dark';
+  } catch {
+    isLight = light !== undefined ? light : true;
+  }
+
   const fontSizes = {
     sm: { text: '1.25rem', halo: '8px', haloTop: '-6px' },
     md: { text: '1.75rem', halo: '10px', haloTop: '-8px' },
@@ -14,7 +25,7 @@ export default function ImoleLogo({ size = 'md', light = true }: ImoleLogoProps)
   };
 
   const current = fontSizes[size];
-  const textColor = light ? '#FFFFFF' : '#120224';
+  const textColor = isLight ? '#FFFFFF' : '#18042B';
 
   return (
     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', userSelect: 'none' }}>
@@ -28,7 +39,8 @@ export default function ImoleLogo({ size = 'md', light = true }: ImoleLogoProps)
             fontSize: current.text,
             color: textColor,
             fontFamily: 'system-ui, -apple-system, sans-serif',
-            textShadow: light ? '0 2px 12px rgba(0, 0, 0, 0.4)' : 'none',
+            textShadow: isLight ? '0 2px 12px rgba(0, 0, 0, 0.4)' : 'none',
+            transition: 'color 0.2s ease',
           }}
         >
           IM
@@ -54,4 +66,3 @@ export default function ImoleLogo({ size = 'md', light = true }: ImoleLogoProps)
     </div>
   );
 }
-

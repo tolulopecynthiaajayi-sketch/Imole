@@ -2,16 +2,24 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useI18n } from '@/components/I18nProvider';
+import { useTheme } from './ThemeProvider';
 
 interface LanguageToggleProps {
-  variant?: 'light' | 'dark';
+  variant?: 'light' | 'dark' | 'auto';
 }
 
-export default function LanguageToggle({ variant = 'light' }: LanguageToggleProps) {
+export default function LanguageToggle({ variant = 'auto' }: LanguageToggleProps) {
   const { lang, setLanguage } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const isDark = variant === 'dark';
+
+  let isDark = true;
+  try {
+    const { theme } = useTheme();
+    isDark = variant === 'auto' ? theme === 'dark' : variant === 'dark';
+  } catch {
+    isDark = variant === 'dark';
+  }
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -41,12 +49,12 @@ export default function LanguageToggle({ variant = 'light' }: LanguageToggleProp
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
-          background: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FFFFFF',
+          background: isDark ? 'rgba(255, 255, 255, 0.08)' : '#FFFFFF',
           backdropFilter: 'blur(16px)',
-          border: isDark ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #E5E7EB',
+          border: isDark ? '1px solid rgba(255, 255, 255, 0.16)' : '1px solid #E5E7EB',
           borderRadius: '9999px',
           padding: '6px 14px',
-          color: isDark ? '#FFFFFF' : '#1F2937',
+          color: isDark ? '#FFFFFF' : '#18042B',
           fontSize: '0.88rem',
           fontWeight: 700,
           cursor: 'pointer',
@@ -118,7 +126,7 @@ export default function LanguageToggle({ variant = 'light' }: LanguageToggleProp
                     ? (isDark ? 'rgba(255, 184, 0, 0.15)' : '#F3F0FA') 
                     : 'transparent',
                   color: isSelected 
-                    ? (isDark ? '#FFB800' : '#300E58') 
+                    ? (isDark ? '#FFB800' : '#18042B') 
                     : (isDark ? 'rgba(255, 255, 255, 0.85)' : '#374151'),
                   fontSize: '0.85rem',
                   fontWeight: isSelected ? 800 : 600,
@@ -132,7 +140,7 @@ export default function LanguageToggle({ variant = 'light' }: LanguageToggleProp
                   <span>{item.label}</span>
                 </div>
                 {isSelected && (
-                  <span style={{ fontSize: '0.85rem', color: isDark ? '#FFB800' : '#300E58', fontWeight: 800 }}>✓</span>
+                  <span style={{ fontSize: '0.85rem', color: isDark ? '#FFB800' : '#18042B', fontWeight: 800 }}>✓</span>
                 )}
               </button>
             );

@@ -1,19 +1,23 @@
 "use client";
 
 import { useI18n } from '@/components/I18nProvider';
+import { useTheme } from '@/components/ThemeProvider';
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import ImoleLogo from '@/components/ImoleLogo';
 import LanguageToggle from '@/components/LanguageToggle';
+import ThemeToggle from '@/components/ThemeToggle';
 import BottomNav from '@/components/BottomNav';
 import { findStationByQrOrSn } from '@/lib/stationsConfig';
 
 function LandingPageContent() {
   const { lang } = useI18n();
+  const { theme } = useTheme();
   const router = useRouter();
   const searchParams = useSearchParams();
   const rawKiosk = searchParams.get('station') || searchParams.get('kiosk') || 'H00000147A';
   const isFr = lang === 'fr';
+  const isDark = theme === 'dark';
 
   const stationData = findStationByQrOrSn(rawKiosk);
   const stationName = stationData 
@@ -22,7 +26,6 @@ function LandingPageContent() {
 
   const [acceptedTerms, setAcceptedTerms] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [showGuideModal, setShowGuideModal] = useState(false);
 
   const handlePay = async () => {
     if (!acceptedTerms) {
@@ -51,24 +54,32 @@ function LandingPageContent() {
     }
   };
 
+  // Color Tokens based on strict 3-color palette
+  const bgColor = isDark ? '#120224' : '#FAF9FE';
+  const bgGradient = isDark
+    ? `radial-gradient(circle at 15% 10%, rgba(255, 184, 0, 0.14) 0%, transparent 45%), linear-gradient(180deg, #120224 0%, #17032E 100%)`
+    : `radial-gradient(circle at 15% 10%, rgba(255, 184, 0, 0.08) 0%, transparent 45%), linear-gradient(180deg, #FAF9FE 0%, #F3F1FA 100%)`;
+  const textPrimary = isDark ? '#FFFFFF' : '#18042B';
+  const textSecondary = isDark ? 'rgba(255, 255, 255, 0.72)' : '#6B7280';
+  const textMuted = isDark ? 'rgba(255, 255, 255, 0.45)' : '#9CA3AF';
+  const borderColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(24, 4, 43, 0.08)';
+  const accentGold = isDark ? '#FFB800' : '#B45309';
+
   return (
     <div style={{
       maxWidth: '440px',
       margin: '0 auto',
       minHeight: '100vh',
-      backgroundColor: '#120224',
-      backgroundImage: `
-        radial-gradient(circle at 15% 10%, rgba(255, 184, 0, 0.15) 0%, transparent 45%),
-        radial-gradient(circle at 85% 80%, rgba(139, 92, 246, 0.18) 0%, transparent 50%),
-        linear-gradient(180deg, #120224 0%, #17032E 100%)
-      `,
+      backgroundColor: bgColor,
+      backgroundImage: bgGradient,
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
       padding: '1.5rem 1.5rem 6.5rem 1.5rem',
       fontFamily: "'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif",
-      color: '#FFFFFF',
+      color: textPrimary,
       position: 'relative',
+      transition: 'background-color 0.25s ease, color 0.25s ease',
     }}>
       {/* Top Header */}
       <div>
@@ -78,18 +89,21 @@ function LandingPageContent() {
           justifyContent: 'space-between',
           marginBottom: '2rem',
         }}>
-          <ImoleLogo size="md" light={true} />
-          <LanguageToggle variant="dark" />
+          <ImoleLogo size="md" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <ThemeToggle />
+            <LanguageToggle variant="auto" />
+          </div>
         </header>
 
-        {/* Discreet Live Station Indicator (No heavy bordered box) */}
+        {/* Live Station Status (Simple text line, no box) */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
           fontSize: '0.82rem',
-          color: 'rgba(255, 255, 255, 0.85)',
-          marginBottom: '1.75rem',
+          color: textSecondary,
+          marginBottom: '2rem',
         }}>
           <span style={{
             width: '8px',
@@ -99,14 +113,14 @@ function LandingPageContent() {
             boxShadow: '0 0 10px #10B981',
             display: 'inline-block',
           }} />
-          <span style={{ fontWeight: 600 }}>{stationName}</span>
-          <span style={{ color: 'rgba(255, 255, 255, 0.3)' }}>•</span>
-          <span style={{ color: '#34D399', fontWeight: 700, fontSize: '0.78rem' }}>
+          <span style={{ fontWeight: 600, color: textPrimary }}>{stationName}</span>
+          <span style={{ opacity: 0.3 }}>•</span>
+          <span style={{ color: '#10B981', fontWeight: 700, fontSize: '0.78rem' }}>
             {isFr ? 'Prête' : 'Ready'}
           </span>
         </div>
 
-        {/* Breathable, Elegant Hero Section (Open typography, NO card box!) */}
+        {/* Hero Section (Open, breathable typography, zero stacked boxes) */}
         <div style={{ marginBottom: '2.5rem' }}>
           <h1 style={{
             fontSize: '2.25rem',
@@ -114,14 +128,14 @@ function LandingPageContent() {
             lineHeight: 1.15,
             letterSpacing: '-0.02em',
             margin: '0 0 0.85rem 0',
-            color: '#FFFFFF',
+            color: textPrimary,
           }}>
             {isFr ? 'Rechargez en toute liberté.' : 'Power up on the go.'}
           </h1>
 
           <p style={{
             fontSize: '0.95rem',
-            color: 'rgba(255, 255, 255, 0.75)',
+            color: textSecondary,
             lineHeight: 1.5,
             margin: '0 0 1.25rem 0',
           }}>
@@ -130,7 +144,7 @@ function LandingPageContent() {
               : 'Universal 6000 mAh power bank with 3 built-in fast cables:'}
           </p>
 
-          {/* Minimalist, Elegant Cable Line (No heavy badges) */}
+          {/* Minimalist cable markers (No heavy colored badges) */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -138,21 +152,21 @@ function LandingPageContent() {
             flexWrap: 'wrap',
             fontSize: '0.82rem',
             fontWeight: 700,
-            color: '#FFD700',
+            color: accentGold,
           }}>
             <span>⚡ Lightning (iPhone)</span>
-            <span style={{ color: 'rgba(255, 255, 255, 0.25)' }}>•</span>
+            <span style={{ opacity: 0.3, color: textSecondary }}>•</span>
             <span>⚡ USB-C</span>
-            <span style={{ color: 'rgba(255, 255, 255, 0.25)' }}>•</span>
+            <span style={{ opacity: 0.3, color: textSecondary }}>•</span>
             <span>⚡ Micro-USB</span>
           </div>
         </div>
 
-        {/* Single Pricing Section (Spacious, transparent, NO 5 nested boxes!) */}
+        {/* Pricing Section (Clean, spacious, single focal area) */}
         <div style={{
           padding: '1.5rem 0',
-          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          borderTop: `1px solid ${borderColor}`,
+          borderBottom: `1px solid ${borderColor}`,
           marginBottom: '2rem',
         }}>
           <div style={{
@@ -164,7 +178,7 @@ function LandingPageContent() {
             <span style={{
               fontSize: '2.5rem',
               fontWeight: 800,
-              color: '#FFB800',
+              color: accentGold,
               letterSpacing: '-0.03em',
               lineHeight: 1,
             }}>
@@ -172,7 +186,7 @@ function LandingPageContent() {
             </span>
             <span style={{
               fontSize: '1rem',
-              color: 'rgba(255, 255, 255, 0.75)',
+              color: textSecondary,
               fontWeight: 600,
             }}>
               {isFr ? 'pour la 1ère heure' : 'for the 1st hour'}
@@ -181,7 +195,7 @@ function LandingPageContent() {
 
           <div style={{
             fontSize: '0.85rem',
-            color: 'rgba(255, 255, 255, 0.65)',
+            color: textSecondary,
             lineHeight: 1.4,
             marginBottom: '0.75rem',
           }}>
@@ -190,7 +204,7 @@ function LandingPageContent() {
 
           <div style={{
             fontSize: '0.75rem',
-            color: 'rgba(255, 255, 255, 0.45)',
+            color: textMuted,
             lineHeight: 1.4,
             display: 'flex',
             alignItems: 'center',
@@ -205,7 +219,7 @@ function LandingPageContent() {
           </div>
         </div>
 
-        {/* Understated, chic Station & Return link (No big heavy box) */}
+        {/* Understated, chic Station & Return link (No box) */}
         <div style={{ marginBottom: '1.5rem' }}>
           <button
             type="button"
@@ -214,14 +228,13 @@ function LandingPageContent() {
               background: 'transparent',
               border: 'none',
               padding: 0,
-              color: '#FFB800',
+              color: accentGold,
               fontSize: '0.85rem',
               fontWeight: 700,
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              transition: 'opacity 0.15s ease',
             }}
           >
             <span>🗺️</span>
@@ -235,21 +248,25 @@ function LandingPageContent() {
 
       {/* Bottom Action Area */}
       <div>
-        {/* Pay Now Button with Golden Sheen */}
+        {/* Action Button */}
         <button
           onClick={handlePay}
           disabled={isLoading}
           style={{
             width: '100%',
-            background: 'linear-gradient(135deg, #FFA751 0%, #FFB800 100%)',
-            color: '#120224',
+            background: isDark 
+              ? 'linear-gradient(135deg, #FFA751 0%, #FFB800 100%)' 
+              : 'linear-gradient(135deg, #18042B 0%, #300E58 100%)',
+            color: isDark ? '#120224' : '#FFFFFF',
             border: 'none',
             borderRadius: '9999px',
             padding: '1.2rem 1.5rem',
             fontSize: '1.15rem',
             fontWeight: 800,
             cursor: isLoading ? 'not-allowed' : 'pointer',
-            boxShadow: '0 12px 36px rgba(255, 184, 0, 0.35)',
+            boxShadow: isDark 
+              ? '0 12px 36px rgba(255, 184, 0, 0.35)' 
+              : '0 12px 32px rgba(24, 4, 43, 0.25)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -261,7 +278,7 @@ function LandingPageContent() {
             <span>{isFr ? 'Paiement en cours...' : 'Processing payment...'}</span>
           ) : (
             <>
-              <span>⚡</span>
+              <span style={{ color: isDark ? '#120224' : '#FFB800' }}>⚡</span>
               <span>{isFr ? 'Payer maintenant • 2,49 €' : 'Pay Now • €2.49'}</span>
             </>
           )}
@@ -275,7 +292,7 @@ function LandingPageContent() {
           gap: '10px',
           marginTop: '0.85rem',
           fontSize: '0.75rem',
-          color: 'rgba(255, 255, 255, 0.55)',
+          color: textMuted,
           fontWeight: 600,
         }}>
           <span> Apple Pay</span>
@@ -292,9 +309,9 @@ function LandingPageContent() {
             id="terms"
             checked={acceptedTerms}
             onChange={(e) => setAcceptedTerms(e.target.checked)}
-            style={{ width: '15px', height: '15px', accentColor: '#FFB800', cursor: 'pointer' }}
+            style={{ width: '15px', height: '15px', accentColor: isDark ? '#FFB800' : '#300E58', cursor: 'pointer' }}
           />
-          <label htmlFor="terms" style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.55)', cursor: 'pointer' }}>
+          <label htmlFor="terms" style={{ fontSize: '0.72rem', color: textMuted, cursor: 'pointer' }}>
             {isFr 
               ? 'J\'accepte les CGU et l\'empreinte temporaire de 24,99 €.'
               : 'I accept the Terms and the €24.99 temporary security hold.'}
