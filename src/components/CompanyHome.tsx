@@ -917,3 +917,4 @@ export default function CompanyHome({ onStartRental }: CompanyHomeProps) {
     </div>
   );
 }
+

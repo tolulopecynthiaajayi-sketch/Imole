@@ -423,3 +423,4 @@ export default function RentalCheckout({ kioskId = 'H00000147A', onBackToHome }:
     </div>
   );
 }
+
