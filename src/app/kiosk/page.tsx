@@ -12,6 +12,7 @@ function KioskDisplay() {
   const searchParams = useSearchParams();
   const kioskParam = searchParams.get('kiosk') || 'H00000147A';
   const initialStatus = searchParams.get('status') as 'idle' | 'confirmation' | 'dispense' | 'return' | null;
+  const showSimulator = searchParams.get('test') === '1';
   
   const rentalUrl = `https://imole.fr/?kiosk=${kioskParam}`;
   const isFr = lang === 'fr';
@@ -197,83 +198,85 @@ function KioskDisplay() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1vw' }}>
-          {/* Hardware Demo State Simulator */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            background: 'rgba(255, 255, 255, 0.08)',
-            borderRadius: '9999px',
-            padding: '2px 4px',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-          }}>
-            <button
-              onClick={() => setKioskState('idle')}
-              style={{
-                background: kioskState === 'idle' ? '#FFB800' : 'transparent',
-                color: kioskState === 'idle' ? '#120224' : 'rgba(255, 255, 255, 0.7)',
-                border: 'none',
-                borderRadius: '9999px',
-                padding: '4px 10px',
-                fontSize: '0.72vw',
-                fontWeight: 700,
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-            >
-              {isFr ? 'Accueil' : 'Attract'}
-            </button>
-            <button
-              onClick={() => setKioskState('confirmation')}
-              style={{
-                background: kioskState === 'confirmation' ? '#FFB800' : 'transparent',
-                color: kioskState === 'confirmation' ? '#120224' : 'rgba(255, 255, 255, 0.7)',
-                border: 'none',
-                borderRadius: '9999px',
-                padding: '4px 10px',
-                fontSize: '0.72vw',
-                fontWeight: 700,
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-            >
-              {isFr ? '💳 Test Tap' : '💳 Test Tap'}
-            </button>
-            <button
-              onClick={() => {
-                setActiveSlot(3);
-                setKioskState('dispensing');
-              }}
-              style={{
-                background: kioskState === 'dispensing' ? '#10B981' : 'transparent',
-                color: kioskState === 'dispensing' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.7)',
-                border: 'none',
-                borderRadius: '9999px',
-                padding: '4px 10px',
-                fontSize: '0.72vw',
-                fontWeight: 700,
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-            >
-              {isFr ? '⚡ Test Éjection' : '⚡ Test Dispense'}
-            </button>
-            <button
-              onClick={() => setKioskState('returned')}
-              style={{
-                background: kioskState === 'returned' ? '#6366F1' : 'transparent',
-                color: kioskState === 'returned' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.7)',
-                border: 'none',
-                borderRadius: '9999px',
-                padding: '4px 10px',
-                fontSize: '0.72vw',
-                fontWeight: 700,
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-            >
-              {isFr ? '✓ Test Retour' : '✓ Test Return'}
-            </button>
-          </div>
+          {/* Hardware Demo State Simulator (Visible only when ?test=1 is in URL) */}
+          {showSimulator && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              background: 'rgba(255, 255, 255, 0.08)',
+              borderRadius: '9999px',
+              padding: '2px 4px',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+            }}>
+              <button
+                onClick={() => setKioskState('idle')}
+                style={{
+                  background: kioskState === 'idle' ? '#FFB800' : 'transparent',
+                  color: kioskState === 'idle' ? '#120224' : 'rgba(255, 255, 255, 0.7)',
+                  border: 'none',
+                  borderRadius: '9999px',
+                  padding: '4px 10px',
+                  fontSize: '0.72vw',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+              >
+                {isFr ? 'Accueil' : 'Attract'}
+              </button>
+              <button
+                onClick={() => setKioskState('confirmation')}
+                style={{
+                  background: kioskState === 'confirmation' ? '#FFB800' : 'transparent',
+                  color: kioskState === 'confirmation' ? '#120224' : 'rgba(255, 255, 255, 0.7)',
+                  border: 'none',
+                  borderRadius: '9999px',
+                  padding: '4px 10px',
+                  fontSize: '0.72vw',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+              >
+                {isFr ? '💳 Test Tap' : '💳 Test Tap'}
+              </button>
+              <button
+                onClick={() => {
+                  setActiveSlot(3);
+                  setKioskState('dispensing');
+                }}
+                style={{
+                  background: kioskState === 'dispensing' ? '#10B981' : 'transparent',
+                  color: kioskState === 'dispensing' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.7)',
+                  border: 'none',
+                  borderRadius: '9999px',
+                  padding: '4px 10px',
+                  fontSize: '0.72vw',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+              >
+                {isFr ? '⚡ Test Éjection' : '⚡ Test Dispense'}
+              </button>
+              <button
+                onClick={() => setKioskState('returned')}
+                style={{
+                  background: kioskState === 'returned' ? '#6366F1' : 'transparent',
+                  color: kioskState === 'returned' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.7)',
+                  border: 'none',
+                  borderRadius: '9999px',
+                  padding: '4px 10px',
+                  fontSize: '0.72vw',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+              >
+                {isFr ? '✓ Test Retour' : '✓ Test Return'}
+              </button>
+            </div>
+          )}
 
           <LanguageToggle variant="dark" />
         </div>
@@ -419,6 +422,10 @@ function KioskDisplay() {
                 <span style={{ fontSize: '0.95vw', color: 'rgba(255, 255, 255, 0.7)' }}>
                   {isFr ? 'puis 1,99 € / h' : 'then €1.99 / hr'}
                 </span>
+                <span style={{ color: 'rgba(255, 255, 255, 0.3)', margin: '0 0.2vw' }}>•</span>
+                <span style={{ fontSize: '0.9vw', color: 'rgba(52, 211, 153, 0.95)', fontWeight: 700 }}>
+                  {isFr ? 'Caution 24,99 € libérée au retour' : '€24.99 hold released on return'}
+                </span>
               </div>
             </div>
 
@@ -430,14 +437,12 @@ function KioskDisplay() {
               marginTop: '0.8vw',
               flexWrap: 'nowrap',
             }}>
-              {/* Option 1: Touch Screen to Start Contactless Rental */}
+              {/* Option 1: Nayax Reader Direction (Point down to physical reader) */}
               <div 
-                onClick={() => setKioskState('confirmation')}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.8vw',
-                  cursor: 'pointer',
                   padding: '4px 0',
                 }}
               >
@@ -466,7 +471,7 @@ function KioskDisplay() {
                     gap: '0.4vw',
                   }}>
                     <span>{isFr ? 'Paiement sans contact' : 'Contactless payment'}</span>
-                    <span style={{ color: '#FFB800' }}>→</span>
+                    <span style={{ color: '#FFB800' }}>↓</span>
                   </div>
                   <div style={{
                     fontSize: '0.78vw',
@@ -475,7 +480,7 @@ function KioskDisplay() {
                     whiteSpace: 'nowrap',
                     marginTop: '0.1vw',
                   }}>
-                    {isFr ? 'Toucher pour voir les tarifs' : 'Touch to view rates'}
+                    {isFr ? 'Sur le lecteur situé juste sous l\'écran' : 'On reader located right below screen'}
                   </div>
                 </div>
               </div>
