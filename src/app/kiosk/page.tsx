@@ -278,7 +278,7 @@ function KioskDisplay() {
             </div>
           )}
 
-          <LanguageToggle variant="dark" />
+          {showSimulator && <LanguageToggle variant="dark" />}
         </div>
       </header>
 
