@@ -13,6 +13,7 @@ function KioskDisplay({ defaultKiosk }: { defaultKiosk?: string }) {
   const kioskParam = searchParams.get('kiosk') || defaultKiosk || 'H00000147A';
   const initialStatus = searchParams.get('status') as 'idle' | 'confirmation' | 'dispense' | 'return' | null;
   const showSimulator = searchParams.get('sim') === '1';
+  const isLight = searchParams.get('theme') === 'light';
   
   const rentalUrl = `https://imole.fr/?kiosk=${kioskParam}`;
   const isFr = lang === 'fr';
@@ -71,17 +72,24 @@ function KioskDisplay({ defaultKiosk }: { defaultKiosk?: string }) {
       maxWidth: '100vw',
       maxHeight: '100vh',
       overflow: 'hidden',
-      backgroundColor: '#120224',
-      backgroundImage: `
-        radial-gradient(circle at 15% 20%, rgba(75, 0, 130, 0.45) 0%, transparent 55%),
-        radial-gradient(circle at 85% 80%, rgba(255, 170, 0, 0.12) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, rgba(48, 14, 88, 0.6) 0%, transparent 70%)
-      `,
-      color: '#FFFFFF',
+      backgroundColor: isLight ? '#FFFFFF' : '#0F021F',
+      backgroundImage: isLight
+        ? `
+          radial-gradient(circle at 15% 25%, rgba(255, 184, 0, 0.22) 0%, transparent 55%),
+          radial-gradient(circle at 85% 85%, rgba(138, 43, 226, 0.12) 0%, transparent 55%),
+          linear-gradient(180deg, #FFFFFF 0%, #F9F7FE 100%)
+        `
+        : `
+          radial-gradient(circle at 25% 30%, rgba(138, 43, 226, 0.55) 0%, transparent 60%),
+          radial-gradient(circle at 80% 70%, rgba(255, 184, 0, 0.25) 0%, transparent 55%),
+          radial-gradient(circle at 50% 50%, rgba(65, 12, 105, 0.75) 0%, transparent 75%),
+          linear-gradient(180deg, #0F021F 0%, #17042E 100%)
+        `,
+      color: isLight ? '#110222' : '#FFFFFF',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
-      padding: '2.2vw 3.8vw',
+      padding: '2.4vw 4.2vw 2vw 4.2vw',
       position: 'relative',
       fontFamily: "'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif",
       boxSizing: 'border-box',
@@ -184,20 +192,20 @@ function KioskDisplay({ defaultKiosk }: { defaultKiosk?: string }) {
         height: '48px',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.2vw' }}>
-          <ImoleLogo size="lg" light={true} />
+          <ImoleLogo size="lg" light={!isLight} />
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1vw' }}>
           <span style={{
-            fontSize: '0.85vw',
-            letterSpacing: '0.12em',
+            fontSize: '0.9vw',
+            letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            color: 'rgba(255, 255, 255, 0.55)',
-            fontWeight: 700,
+            color: isLight ? '#4B5563' : '#FFFFFF',
+            fontWeight: 800,
           }}>
             Lille • Réseau de recharge
           </span>
-          {showSimulator && <LanguageToggle variant="dark" />}
+          {showSimulator && <LanguageToggle variant={isLight ? 'light' : 'dark'} />}
         </div>
       </header>
 
@@ -212,7 +220,7 @@ function KioskDisplay({ defaultKiosk }: { defaultKiosk?: string }) {
           flex: 1,
           gap: '5vw',
           zIndex: 5,
-          margin: '1vw 0',
+          margin: '0.8vw 0',
         }}>
           {/* Left Column: Pure Editorial Typography, Pricing & Nayax Direction */}
           <div style={{
@@ -223,74 +231,77 @@ function KioskDisplay({ defaultKiosk }: { defaultKiosk?: string }) {
           }}>
             {/* Elegant Sub-Hook */}
             <div style={{
-              fontSize: '0.9vw',
-              fontWeight: 800,
+              fontSize: '0.95vw',
+              fontWeight: 900,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
-              color: '#FFB800',
+              color: isLight ? '#D97706' : '#FFB800',
               marginBottom: '0.8vw',
             }}>
-              Batteries universelles 6000 mAh
+              ⚡ Batteries universelles 6000 mAh
             </div>
 
             {/* Hero Headline */}
             <h1 style={{
-              fontSize: '4.4vw',
+              fontSize: '4.8vw',
               fontWeight: 900,
-              lineHeight: 1.06,
+              lineHeight: 1.05,
               letterSpacing: '-0.035em',
               margin: '0 0 1vw 0',
-              color: '#FFFFFF',
+              color: isLight ? '#110222' : '#FFFFFF',
             }}>
               Batterie à 5% ?<br />
               Repartez à <span style={{
-                background: 'linear-gradient(135deg, #FFB800 0%, #FFA000 100%)',
+                background: isLight 
+                  ? 'linear-gradient(135deg, #D97706 0%, #B45309 100%)'
+                  : 'linear-gradient(135deg, #FFB800 0%, #FFA000 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
+                filter: isLight ? 'none' : 'drop-shadow(0 0 25px rgba(255, 184, 0, 0.45))',
               }}>100%</span>.
             </h1>
 
             {/* Single Elegant Description */}
             <p style={{
-              fontSize: '1.2vw',
-              color: 'rgba(255, 255, 255, 0.75)',
+              fontSize: '1.25vw',
+              color: isLight ? '#374151' : '#FFFFFF',
               lineHeight: 1.45,
-              margin: '0 0 2.2vw 0',
-              maxWidth: '92%',
-              fontWeight: 500,
+              margin: '0 0 2vw 0',
+              maxWidth: '94%',
+              fontWeight: 600,
             }}>
               3 câbles intégrés (Lightning • USB-C • Micro-USB).<br />
               Empruntez ici, déposez dans n&apos;importe quelle borne à Lille.
             </p>
 
-            {/* Pure Typographic Pricing (Zero Cluttered Boxes) */}
+            {/* Pure Typographic Pricing */}
             <div style={{
               display: 'flex',
               alignItems: 'baseline',
               gap: '0.9vw',
-              marginBottom: '2.5vw',
+              marginBottom: '2.2vw',
             }}>
               <span style={{
-                fontSize: '3.4vw',
+                fontSize: '3.6vw',
                 fontWeight: 900,
-                color: '#FFB800',
+                color: isLight ? '#D97706' : '#FFB800',
                 letterSpacing: '-0.02em',
                 lineHeight: 1,
               }}>
                 2,49 €
               </span>
               <span style={{
-                fontSize: '1.2vw',
-                fontWeight: 700,
-                color: '#FFFFFF',
+                fontSize: '1.25vw',
+                fontWeight: 800,
+                color: isLight ? '#110222' : '#FFFFFF',
               }}>
                 1ère heure incluse
               </span>
-              <span style={{ color: 'rgba(255, 255, 255, 0.35)', fontSize: '1.2vw' }}>•</span>
+              <span style={{ color: isLight ? '#9CA3AF' : 'rgba(255, 255, 255, 0.4)', fontSize: '1.2vw' }}>•</span>
               <span style={{
-                fontSize: '1.05vw',
-                color: 'rgba(255, 255, 255, 0.65)',
-                fontWeight: 500,
+                fontSize: '1.1vw',
+                color: isLight ? '#4B5563' : '#FFFFFF',
+                fontWeight: 600,
               }}>
                 puis 1,99 € / h
               </span>
@@ -303,36 +314,37 @@ function KioskDisplay({ defaultKiosk }: { defaultKiosk?: string }) {
               gap: '1.1vw',
             }}>
               <div style={{
-                width: '3.2vw',
-                height: '3.2vw',
+                width: '3.4vw',
+                height: '3.4vw',
                 borderRadius: '50%',
-                background: 'rgba(255, 184, 0, 0.15)',
-                border: '1.5px solid rgba(255, 184, 0, 0.4)',
-                color: '#FFB800',
+                background: isLight ? '#FFFBEB' : 'rgba(255, 184, 0, 0.2)',
+                border: isLight ? '2px solid #FCD34D' : '2px solid #FFB800',
+                color: isLight ? '#B45309' : '#FFB800',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '1.5vw',
+                fontSize: '1.6vw',
                 flexShrink: 0,
+                boxShadow: isLight ? '0 4px 12px rgba(245, 158, 11, 0.15)' : '0 0 20px rgba(255, 184, 0, 0.4)',
               }}>
                 💳
               </div>
               <div>
                 <div style={{
-                  fontSize: '1.25vw',
-                  fontWeight: 800,
-                  color: '#FFFFFF',
+                  fontSize: '1.3vw',
+                  fontWeight: 900,
+                  color: isLight ? '#110222' : '#FFFFFF',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.5vw',
                 }}>
                   <span>Paiement sans contact</span>
-                  <span style={{ color: '#FFB800', fontSize: '1.4vw' }}>↓</span>
+                  <span style={{ color: isLight ? '#D97706' : '#FFB800', fontSize: '1.5vw' }}>↓</span>
                 </div>
                 <div style={{
-                  fontSize: '0.88vw',
-                  color: 'rgba(255, 255, 255, 0.6)',
-                  fontWeight: 500,
+                  fontSize: '0.92vw',
+                  color: isLight ? '#4B5563' : '#FFFFFF',
+                  fontWeight: 600,
                   marginTop: '0.15vw',
                 }}>
                   Approchez votre carte ou smartphone sur le lecteur sous l&apos;écran
@@ -352,18 +364,21 @@ function KioskDisplay({ defaultKiosk }: { defaultKiosk?: string }) {
           }}>
             <div style={{
               background: '#FFFFFF',
-              padding: '2.4vw',
+              padding: '2.2vw',
               borderRadius: '2.6vw',
-              boxShadow: '0 30px 80px rgba(0, 0, 0, 0.8), 0 0 60px rgba(255, 184, 0, 0.25)',
+              boxShadow: isLight
+                ? '0 25px 70px rgba(17, 2, 34, 0.14), 0 0 50px rgba(255, 184, 0, 0.18)'
+                : '0 30px 80px rgba(0, 0, 0, 0.85), 0 0 60px rgba(255, 184, 0, 0.35)',
+              border: isLight ? '2px solid rgba(17, 2, 34, 0.08)' : '3px solid rgba(255, 184, 0, 0.35)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '1.2vw',
+              gap: '1.1vw',
               textAlign: 'center',
             }}>
               <QRCodeSVG 
                 value={rentalUrl} 
-                size={240}
+                size={235}
                 level="H"
                 fgColor="#0E021B"
               />
@@ -371,7 +386,7 @@ function KioskDisplay({ defaultKiosk }: { defaultKiosk?: string }) {
               <div>
                 <div style={{
                   fontSize: '1vw',
-                  fontWeight: 800,
+                  fontWeight: 900,
                   color: '#0E021B',
                   letterSpacing: '0.04em',
                   textTransform: 'uppercase',
@@ -379,9 +394,9 @@ function KioskDisplay({ defaultKiosk }: { defaultKiosk?: string }) {
                   Flashez pour débloquer
                 </div>
                 <div style={{
-                  fontSize: '0.78vw',
-                  fontWeight: 600,
-                  color: '#6B7280',
+                  fontSize: '0.8vw',
+                  fontWeight: 700,
+                  color: '#4B5563',
                   marginTop: '0.25vw',
                 }}>
                   imole.fr • Aucun téléchargement requis
@@ -947,14 +962,15 @@ function KioskDisplay({ defaultKiosk }: { defaultKiosk?: string }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+        borderTop: isLight ? '1px solid rgba(17, 2, 34, 0.1)' : '1px solid rgba(255, 255, 255, 0.15)',
         paddingTop: '1vw',
         zIndex: 10,
-        fontSize: '0.85vw',
-        color: 'rgba(255, 255, 255, 0.5)',
+        fontSize: '0.88vw',
+        fontWeight: 600,
+        color: isLight ? '#4B5563' : '#E2E8F0',
       }}>
         <span>📍 Borne #{kioskParam} • Déposez dans toute la métropole lilloise</span>
-        <span>🔒 Paiement sécurisé • Caution débloquée immédiatement au retour</span>
+        <span>🔒 Caution restituée instantanément au retour</span>
       </footer>
     </div>
   );
